@@ -25,11 +25,11 @@ function fmtDate(d: Date | string) {
 
 export function AnalysisSection({
   patternId,
-  patternStringId,
+  
   existingAnalysis,
 }: {
   patternId: string;
-  patternStringId: string;
+  
   existingAnalysis: PatternAnalysis | null;
 }) {
   const [analysis, setAnalysis] = useState<PatternAnalysis | null>(existingAnalysis);
