@@ -1,65 +1,118 @@
-import Image from "next/image";
+import Link from "next/link";
+import clientPromise from "@/lib/mongo";
+import type { Pattern } from "@/types";
+import { getPatternColor } from "@/types";
+import { NewPatternButton } from "@/components/NewPatternButton";
 
-export default function Home() {
+const COLOR: Record<string, { badge: string; border: string; belief: string }> = {
+  amber: { badge: "bg-amber-400/10 text-amber-400 border-amber-400/20", border: "border-amber-400/15", belief: "text-amber-400/60" },
+  blue:  { badge: "bg-mist-400/10 text-mist-400 border-mist-400/20",   border: "border-mist-400/15",  belief: "text-mist-400/60"  },
+  red:   { badge: "bg-rust-400/10 text-rust-400 border-rust-400/20",   border: "border-rust-400/15",  belief: "text-rust-400/60"  },
+  green: { badge: "bg-sage-400/10 text-sage-400 border-sage-400/20",   border: "border-sage-400/15",  belief: "text-sage-400/60"  },
+};
+
+async function getPatterns(): Promise<Pattern[]> {
+  const client = await clientPromise;
+  return client.db("hope").collection<Pattern>("psy")
+    .find({ type: "pattern" }).sort({ id: 1 }).toArray()
+    .then((docs) => docs.map((d) => ({ ...d, _id: String(d._id) })));
+}
+
+export default async function Home() {
+  const patterns = await getPatterns();
+  const reference = patterns.filter((p) => {
+    const num = parseInt(p.id.replace("P", ""));
+    return num <= 11;
+  });
+  const live = patterns.filter((p) => {
+    const num = parseInt(p.id.replace("P", ""));
+    return num > 11;
+  });
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen max-w-xl mx-auto px-4 py-8">
+
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="font-display text-3xl text-parchment-100 leading-tight">
+          Psyche <span className="text-gold-400">Log</span>
+        </h1>
+        <p className="text-xs text-parchment-300/35 mt-1 font-mono">
+          {patterns.length} patterns · personal clinical journal
+        </p>
+      </div>
+
+      {/* New pattern CTA */}
+      <div className="mb-8">
+        <NewPatternButton />
+      </div>
+
+      {/* Live patterns (P12+) */}
+      {live.length > 0 && (
+        <div className="mb-8">
+          <p className="text-[10px] text-parchment-300/30 uppercase tracking-widest mb-3">Recent entries</p>
+          <div className="space-y-3">
+            {live.reverse().map((p) => (
+              <PatternCard key={p.id} pattern={p} />
+            ))}
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      )}
+
+      {/* Reference patterns (P1–P11) */}
+      <div>
+        <p className="text-[10px] text-parchment-300/30 uppercase tracking-widest mb-3">Reference patterns</p>
+        <div className="space-y-3">
+          {reference.map((p) => (
+            <PatternCard key={p.id} pattern={p} />
+          ))}
         </div>
-      </main>
+      </div>
     </div>
+  );
+}
+
+function PatternCard({ pattern: p }: { pattern: Pattern }) {
+  const color = getPatternColor(p.id);
+  const cls = COLOR[color] ?? COLOR.amber;
+  const isLive = parseInt(p.id.replace("P", "")) > 11;
+
+  return (
+    <Link
+      href={`/patterns/${p.id}`}
+      className={`glass rounded-xl p-4 flex flex-col gap-2.5 border ${cls.border} hover:bg-parchment-100/[0.025] transition-all duration-200 active:scale-[0.99] block`}
+    >
+      <div className="flex items-center justify-between">
+        <span className={`text-xs font-mono px-2 py-0.5 rounded border ${cls.badge}`}>{p.id}</span>
+        <div className="flex items-center gap-2">
+          {isLive && p.analysis && (
+            <span className="text-[10px] font-mono text-sage-400/60">✦ analyzed</span>
+          )}
+          {isLive && !p.analysis && (
+            <span className="text-[10px] font-mono text-gold-400/40">pending</span>
+          )}
+          <span className="text-parchment-300/20 text-xs">→</span>
+        </div>
+      </div>
+
+      <h2 className="font-display text-base text-parchment-100 leading-snug">{p.label}</h2>
+
+      <p className={`text-xs italic leading-relaxed line-clamp-1 ${cls.belief}`}>
+        "{p.coreBelief}"
+      </p>
+
+      {p.cognitiveLabels.length > 0 && (
+        <div className="flex flex-wrap gap-1">
+          {p.cognitiveLabels.slice(0, 3).map((l) => (
+            <span key={l} className="text-[10px] px-1.5 py-0.5 rounded bg-parchment-300/5 text-parchment-300/30 font-mono">
+              {l}
+            </span>
+          ))}
+          {p.cognitiveLabels.length > 3 && (
+            <span className="text-[10px] text-parchment-300/20">+{p.cognitiveLabels.length - 3}</span>
+          )}
+        </div>
+      )}
+    </Link>
   );
 }
