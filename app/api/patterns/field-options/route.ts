@@ -5,7 +5,7 @@ export async function GET() {
   try {
     const client = await clientPromise;
     const doc = await client.db("hope").collection("fields")
-      .findOne({ _id: "clinical_fields_v1" });
+      .findOne({ _id: "clinical_fields_v1" } as any);
 
     if (!doc) {
       return NextResponse.json({
