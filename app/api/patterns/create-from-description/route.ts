@@ -15,9 +15,8 @@ The user will describe a real situation they experienced. Your job is TWO things
 CLINICAL PROFILE:
 ROOT BELIEF: "I am fundamentally at risk of being seen as incompetent by someone with power over me."
 THREAT EQUATION: Competence = safety. Incompetence = attack.
-ORIGIN: DEKRA Automotive Maroc, 7 years. Nervous system formed under chronic threat.
 SCHEMAS: Defectiveness (root) → Failure (achievement domain) → Unrelenting Standards (compensatory)
-GILBERT SYSTEMS: Threat chronically dominant. Drive contaminated by threat (fearful striving). Soothing severely underdeveloped.
+GILBERT SYSTEMS: Threat chronically dominant. Drive contaminated by threat. Soothing severely underdeveloped.
 KNOWN PATTERNS: P1=Career Uncertainty, P2=Coworker Motives, P3=Boss Reaction, P4=Waiting Pain, P5=Social Validation, P6=Perfectionism, P7=Hostile Attribution, P8=Auto Social Simulation, P9=Third-Person Eval Simulation, P10=Rumination Engine, P11=Status Threat
 
 Respond ONLY with a single valid JSON object. No preamble. No explanation. No markdown. No code fences. Start your response with { and end with }.`;
@@ -47,12 +46,12 @@ export async function POST(req: NextRequest) {
 
 "${description}"
 
-Based on this description and the clinical profile, return a single JSON object with exactly this structure:
+Return a single JSON object with exactly this structure:
 {
   "pattern": {
-    "label": "<short clinical name for this pattern>",
+    "label": "<short clinical name>",
     "short": "<2-3 word version>",
-    "coreBelief": "<the specific belief driving this instance, one sentence>",
+    "coreBelief": "<the specific belief driving this, one sentence>",
     "symptoms": ["<symptom 1>", "<symptom 2>", "<symptom 3>", "<symptom 4>"],
     "cognitiveLabels": ["<CBT distortion 1>", "<CBT distortion 2>", "<CBT distortion 3>"],
     "note": "<which known patterns this relates to>"
