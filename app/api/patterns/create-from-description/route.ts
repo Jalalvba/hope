@@ -104,7 +104,8 @@ Return a single JSON object with exactly this structure:
       updatedAt: new Date(),
     };
 
-    const result = await db.collection("psy").insertOne(doc);
+    const { _id: _omit, ...docToInsert } = doc;
+    const result = await db.collection("psy").insertOne(docToInsert);
 
     return NextResponse.json({
       data: { ...doc, _id: String(result.insertedId) },
