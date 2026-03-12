@@ -5,6 +5,7 @@ import { ObjectId } from "mongodb";
 import type { Pattern } from "@/types";
 import { getPatternColor } from "@/types";
 import { AnalysisSection } from "@/components/AnalysisSection";
+import { PatternActions } from "@/components/PatternActions";
 
 const COLOR: Record<string, { badge: string; title: string; border: string }> = {
   amber: { badge: "bg-amber-400/10 text-amber-400 border-amber-400/20", title: "text-amber-400", border: "border-amber-400/20" },
@@ -36,12 +37,15 @@ export default async function PatternPage({
 
   return (
     <div className="min-h-screen max-w-xl mx-auto px-4 py-8">
-      <Link
-        href="/"
-        className="inline-flex items-center gap-1.5 text-xs text-parchment-300/35 hover:text-parchment-300/60 transition-colors mb-6"
-      >
-        ← All patterns
-      </Link>
+      <div className="flex items-center justify-between mb-6">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-xs text-parchment-300/35 hover:text-parchment-300/60 transition-colors"
+        >
+          ← All patterns
+        </Link>
+        {isLive && <PatternActions pattern={pattern} />}
+      </div>
 
       <div className={`glass rounded-xl p-5 border ${cls.border} mb-6`}>
         <div className="flex items-center justify-between mb-4">
