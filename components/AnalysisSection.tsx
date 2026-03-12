@@ -9,9 +9,7 @@ const SCHEMA_CLS: Record<string, string> = {
   "Unrelenting Standards": "text-mist-400",
 };
 const MODE_CLS: Record<string, string> = {
-  Surrender: "text-sage-400",
-  Escape: "text-mist-400",
-  Counterattack: "text-rust-400",
+  Surrender: "text-sage-400", Escape: "text-mist-400", Counterattack: "text-rust-400",
 };
 const SYS_CLS: Record<string, string> = {
   threat: "bg-rust-400/10 text-rust-400",
@@ -23,29 +21,15 @@ function fmtDate(d: Date | string) {
   return new Date(d).toLocaleDateString("fr-MA", { day: "2-digit", month: "short", year: "numeric" });
 }
 
-export function AnalysisSection({
-  patternId,
-  
-  existingAnalysis,
-}: {
-  patternId: string;
-  
-  existingAnalysis: PatternAnalysis | null;
-}) {
+export function AnalysisSection({ patternId, existingAnalysis }: { patternId: string; existingAnalysis: PatternAnalysis | null }) {
   const [analysis, setAnalysis] = useState<PatternAnalysis | null>(existingAnalysis);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Auto-run on first open if no analysis yet
-  useEffect(() => {
-    if (!analysis) {
-      runAnalysis();
-    }
-  }, []);
+  useEffect(() => { if (!analysis) runAnalysis(); }, []);
 
   const runAnalysis = async () => {
-    setLoading(true);
-    setError("");
+    setLoading(true); setError("");
     try {
       const res = await fetch("/api/patterns/analyze", {
         method: "POST",
@@ -54,85 +38,74 @@ export function AnalysisSection({
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error);
-      setAnalysis(json.data);
+      const a = json.data?.analysis ?? json.data;
+      setAnalysis(a);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Analysis failed");
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
-  if (loading) {
-    return (
-      <div className="glass rounded-xl p-6 flex flex-col items-center gap-3">
-        <div className="w-5 h-5 rounded-full border border-gold-400/30 border-t-gold-400 animate-spin" />
-        <p className="text-xs text-parchment-300/40">Analyzing with Claude…</p>
-      </div>
-    );
-  }
+  if (loading) return (
+    <div className="glass rounded-xl p-8 flex flex-col items-center gap-3">
+      <div className="w-5 h-5 rounded-full border border-gold-400/30 border-t-gold-400 animate-spin" />
+      <p className="text-xs text-parchment-300/40">Analyzing with Claude…</p>
+    </div>
+  );
 
-  if (error) {
-    return (
-      <div className="glass rounded-xl p-5 space-y-3">
-        <p className="text-xs text-rust-400">{error}</p>
-        <button onClick={runAnalysis} className="text-xs text-gold-400/60 hover:text-gold-400 transition-colors">
-          Try again
-        </button>
-      </div>
-    );
-  }
+  if (error) return (
+    <div className="glass rounded-xl p-5 space-y-3">
+      <p className="text-xs text-rust-400">{error}</p>
+      <button onClick={runAnalysis} className="text-xs text-gold-400/60 hover:text-gold-400 transition-colors">Try again</button>
+    </div>
+  );
 
   if (!analysis) return null;
 
+  const schemaActivated = Array.isArray(analysis.schemaActivated) ? analysis.schemaActivated : [];
+  const systemsInvolved = Array.isArray(analysis.systemsInvolved) ? analysis.systemsInvolved : [];
+  const relatedPatterns = Array.isArray(analysis.relatedPatterns) ? analysis.relatedPatterns : [];
+  const bookMappings = Array.isArray(analysis.bookMappings) ? analysis.bookMappings : [];
+
   return (
     <div className="glass rounded-xl p-5 space-y-4 border-l-2 border-gold-400/25">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-gold-400">✦</span>
           <span className="text-[10px] text-gold-400/70 uppercase tracking-widest font-medium">Claude Analysis</span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-[10px] text-parchment-300/25 font-mono">{fmtDate(analysis.analyzedAt)}</span>
-          <button onClick={runAnalysis} className="text-[10px] text-parchment-300/25 hover:text-gold-400/50 transition-colors">
-            re-run
-          </button>
+          {analysis.analyzedAt && <span className="text-[10px] text-parchment-300/25 font-mono">{fmtDate(analysis.analyzedAt)}</span>}
+          <button onClick={runAnalysis} className="text-[10px] text-parchment-300/25 hover:text-gold-400/50 transition-colors">re-run</button>
         </div>
       </div>
 
-      {/* Summary */}
-      <p className="text-sm text-parchment-200/85 leading-relaxed italic">{analysis.summary}</p>
+      {analysis.summary && <p className="text-sm text-parchment-200/85 leading-relaxed italic">{analysis.summary}</p>}
 
-      {/* Tags */}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-        {analysis.schemaActivated.map((s) => (
-          <span key={s} className={`text-xs font-medium ${SCHEMA_CLS[s] ?? "text-parchment-300"}`}>{s}</span>
-        ))}
-        <span className="text-parchment-300/15">·</span>
-        <span className={`text-xs font-medium ${MODE_CLS[analysis.responseMode] ?? ""}`}>{analysis.responseMode}</span>
-        <span className="text-parchment-300/15">·</span>
-        {analysis.systemsInvolved.map((s) => (
-          <span key={s} className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${SYS_CLS[s]}`}>{s}</span>
-        ))}
+        {schemaActivated.map((s) => <span key={s} className={`text-xs font-medium ${SCHEMA_CLS[s] ?? "text-parchment-300"}`}>{s}</span>)}
+        {analysis.responseMode && <>
+          <span className="text-parchment-300/15">·</span>
+          <span className={`text-xs font-medium ${MODE_CLS[analysis.responseMode] ?? ""}`}>{analysis.responseMode}</span>
+        </>}
+        {systemsInvolved.length > 0 && <>
+          <span className="text-parchment-300/15">·</span>
+          {systemsInvolved.map((s) => <span key={s} className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${SYS_CLS[s] ?? "bg-parchment-300/5 text-parchment-300/40"}`}>{s}</span>)}
+        </>}
       </div>
 
-      {/* Related patterns */}
-      {analysis.relatedPatterns?.length > 0 && (
+      {relatedPatterns.length > 0 && (
         <div>
           <p className="text-[10px] text-parchment-300/30 uppercase tracking-widest mb-1.5">Related patterns</p>
           <div className="flex flex-wrap gap-1.5">
-            {analysis.relatedPatterns.map((p) => (
-              <span key={p} className="text-[10px] px-1.5 py-0.5 rounded border border-parchment-300/10 text-parchment-300/40 font-mono">{p}</span>
-            ))}
+            {relatedPatterns.map((p) => <span key={p} className="text-[10px] px-1.5 py-0.5 rounded border border-parchment-300/10 text-parchment-300/40 font-mono">{p}</span>)}
           </div>
         </div>
       )}
 
-      {/* Book mappings */}
-      {analysis.bookMappings?.length > 0 && (
+      {bookMappings.length > 0 && (
         <div className="space-y-2">
           <p className="text-[10px] text-parchment-300/30 uppercase tracking-widest">Book frameworks</p>
-          {analysis.bookMappings.map((m, i) => (
+          {bookMappings.map((m, i) => (
             <div key={i} className="flex gap-2 text-xs">
               <span className="text-parchment-300/20 font-mono shrink-0">—</span>
               <div>
@@ -145,11 +118,12 @@ export function AnalysisSection({
         </div>
       )}
 
-      {/* Practice */}
-      <div className="bg-sage-400/5 border border-sage-400/10 rounded-lg px-3 py-3">
-        <p className="text-[10px] text-sage-400/55 uppercase tracking-widest mb-1.5">Practice</p>
-        <p className="text-xs text-parchment-200/70 leading-relaxed">{analysis.practiceRecommendation}</p>
-      </div>
+      {analysis.practiceRecommendation && (
+        <div className="bg-sage-400/5 border border-sage-400/10 rounded-lg px-3 py-3">
+          <p className="text-[10px] text-sage-400/55 uppercase tracking-widest mb-1.5">Practice</p>
+          <p className="text-xs text-parchment-200/70 leading-relaxed">{analysis.practiceRecommendation}</p>
+        </div>
+      )}
     </div>
   );
 }
