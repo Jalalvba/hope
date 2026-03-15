@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import Link from "next/link";
 import clientPromise from "@/lib/mongo";
 import type { Pattern } from "@/types";
