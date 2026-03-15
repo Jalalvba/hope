@@ -40,3 +40,18 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .env*.local
+
+# Sensitive
+.env.local
+.env
+
+# Large data files — seed separately
+ryl_database.json
+mct_database.json
+seed-knowledge.js
+seed-fields.js
+
+# Build artifacts
+hope@0.1.0
+hope-*.tar.gz
+*.tar.gz
