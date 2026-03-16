@@ -19,12 +19,25 @@ export interface Pattern {
 export interface PatternAnalysis {
   analyzedAt: Date;
   summary: string;
+  woundActivation?: string;
   schemaActivated: string[];
-  responseMode: "Surrender" | "Escape" | "Counterattack";
+  responseMode: "Surrender" | "Escape" | "Counterattack" | "Regulation";
+  operationalFact?: string;
+  schemaNarrative?: string;
   systemsInvolved: ("threat" | "drive" | "soothing")[];
+  casComponents?: string[];
+  positiveMetacognitiveBelief?: string;
   relatedPatterns: string[];
   bookMappings: { concept: string; source: string; relevance: string }[];
+  whatTheSchemaIsConstructing?: string;
+  whatTheSituationActuallyNeeds?: string;
+  regulationEvidence?: string | null;
   practiceRecommendation: string;
+  layerStatus?: {
+    behavioral: string;
+    cognitive: string;
+    schema: string;
+  };
 }
 
 // ─── Color helper ─────────────────────────────────────────────────────────────
