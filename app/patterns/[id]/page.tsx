@@ -103,12 +103,10 @@ export default async function PatternPage({
         )}
       </div>
 
-      {isLive && (
-        <AnalysisSection
+      <AnalysisSection
           patternId={String(pattern._id)}
           existingAnalysis={pattern.analysis ?? null}
         />
-      )}
     </div>
   );
 }
