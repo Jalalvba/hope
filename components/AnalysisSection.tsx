@@ -84,7 +84,7 @@ export function AnalysisSection({
       <div className="glass rounded-xl p-5 space-y-3">
         <p className="text-xs text-rust-400">{error}</p>
         <button
-          onClick={runAnalysis}
+          onClick={() => runAnalysis(false)}
           className="text-xs text-gold-400/60 hover:text-gold-400 transition-colors"
         >
           Try again
