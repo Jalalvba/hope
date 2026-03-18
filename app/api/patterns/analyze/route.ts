@@ -130,29 +130,52 @@ PROFESSIONAL HISTORY:
 - AVIS Maroc: Jul 2025 — present — 8 months. Currently staying, regulating, not running. First environment where new wiring is being built.
 - Core pattern identified: conflict with hierarchy triggered automatic exit. Pattern broken at AVIS — staying despite activation.
 
-CHILDHOOD ORIGIN — FULLY MAPPED:
+CHILDHOOD ORIGIN — FULLY MAPPED INCLUDING ABUSE LAYER:
+
+STRUCTURAL LAYER (father):
 Father's equation: preparation and excellence is the only legitimate use of time. Every summer spent studying next year's curriculum at home while other children traveled and collected experiences. No beach. No stories to bring back in September. The child scanned available currencies of worth — sport, looks, money, social ease — and found them all unavailable. Found one: academic competence. That became the only path to being visible and safe.
-This is where the schemas were first installed — not at DEKRA. DEKRA confirmed and deepened what was already written in childhood.
-The child who had nothing special to offer except his mind — that is the one the schemas are still protecting.
-Self-deprivation layer: desires for pleasure (PlayStation, travel, spending) were suppressed throughout childhood and DEKRA years. Since Super Auto the patient has been actively moving against this — traveling Morocco, spending on experiences. The soothing system is learning to activate through chosen experience rather than earned permission.
+
+PHYSICAL ABUSE LAYER (critical — first disclosed March 2026):
+The home was not safe. Physical abuse occurred before age 9. Specific incidents: beaten with a cable leaving visible marks on the body. Tied to the foundation beam of the house to prevent going outside to play. This is pre-verbal trauma — installed in the body before the child had language to process it. This is not a schema formed from subtle conditional parenting. This is a nervous system that learned under conditions of real physical danger that performance was survival. The schemas did not form from difficult parenting — they formed as an adaptive response to an environment where the body itself was not safe.
+
+MOTHER LAYER:
+Mother's love was explicitly conditional on money — if you gave money she showed love and respect, if not she was cold and indifferent. Pure conditional regard. After leaving home at 26, the mother's potential harassment about unemployment was a real threat — the patient did not feel safe being unemployed because home was not a refuge. This explains why DEKRA felt like safety despite its harshness — the workplace provided a form of safety the family home never did.
+
+AGE 26 — THE FIRST EXIT:
+At peak anxiety and stress, the patient packed clothes in a suitcase by impulse and left the family home. Went to live in the security guard's room at the workplace — escaping one subjugation directly into another. The Rebel asserting autonomy, but with nowhere to go except deeper into the wound. This is the origin event the recurring clothes dream is now reprocessing.
+
+SELF-DEPRIVATION LAYER:
+Desires for pleasure were suppressed throughout childhood and DEKRA years. Since Super Auto the patient has been actively moving against this — traveling Morocco, spending on experiences. The soothing system is learning to activate through chosen experience rather than earned permission.
+
+DREAM DATA — CURRENT INTEGRATION EVIDENCE (March 2026):
+Two recurring dreams have been running intensely for the past three months — precisely the same three months of active self-analysis:
+
+Dream 1 — CLOTHES AND LEAVING: Operational detail of choosing own clothes from wardrobe, arguing with parents (especially mother), leaving the home, going to own apartment. Emotional signature: pure relief. No guilt. This is the Subjugation schema being corrected at the emotional level — the nervous system rehearsing autonomy with a safe destination. The corrective experience the 26-year-old exit lacked.
+
+Dream 2 — EXAM RELIVING: Reliving high-stakes exams (classes préparatoires, baccalauréat) in vivid detail — full concentration, full presence, feeling the question, complete mental clarity. Emotional signature: success, competence, the gift of the mind working perfectly. NOT anxiety dreams. The opposite — the sleeping mind running the exams with the state the patient deserved but couldn't access due to threat system overload at the time. The competence was always real. The anxiety was the problem, not the capability.
+
+SIGNIFICANCE OF DREAM DATA FOR CLINICAL WORK:
+The dreams are doing at the pre-verbal/body level what conversation does at the cognitive level. The nervous system is processing and correcting schema material that predates language. Every time the exam dream runs successfully, the nervous system updates a record that bypasses the schema's filtering — the competence was real, the threat equation was false. Every time the clothes dream ends in relief at the own apartment, the body registers that autonomy leads to safety not catastrophe. These dreams represent the emotional and somatic layer of schema healing activating — the layer that cannot be reached through analysis alone.
+
+This is where the schemas were first installed — not at DEKRA. DEKRA confirmed and deepened what was already written in a body that was hurt before it had words.
+The child who was tied to a beam so he couldn't go outside to play — that is the one the schemas are still protecting.
 
 THREE PRIMARY SCHEMAS (Young & Klosko):
 
 1. UNRELENTING STANDARDS (primary driver):
-Origin: Father's formation. Excellence as the only legitimate use of time. Summers as preparation. Desires, rest, pleasure — not legitimate. The child learned that ordinary is invisible and that to matter you must be exceptional.
-Current expression: Must be indispensable at every level. Ordinary performance = invisibility = danger. The trial never ends because stopping performing means losing the only currency that makes existence safe.
-Key breakthrough insight: The schema requires being exceptional not for satisfaction — but as the condition for existing in any meaningful way. At AVIS, the actual job requires only: anticipate, inform, stay in domain. Nothing obligates the patient to have a solution for everything. The power and decisions belong to Mehdi. The fighting was the schema running — not the situation requiring it. First time the gap between what the situation needs and what the wound demands was seen clearly.
+Origin: Father's formation plus physical abuse context. Excellence as the only legitimate use of time. But more than that — in a home where physical safety was not guaranteed and love was conditional on money, being exceptional was not just about visibility. It was the only available form of protection. The child who was tied to a beam to prevent going outside learned that having no value = no protection. Academic competence became armor, not just currency.
+Current expression: Must be indispensable at every level. Ordinary performance = invisibility = danger. The trial never ends because stopping performing means losing the only protection that ever worked.
+Key breakthrough insight: The schema requires being exceptional not for satisfaction — but as the condition for existing safely. At AVIS, the actual job requires only: anticipate, inform, stay in domain. The fighting was the schema running — not the situation requiring it.
 
 2. SUBJUGATION — REBEL TYPE (secondary, pairs with Unrelenting Standards):
-Origin: Same childhood environment. Father decided how summers would be spent. The child's preferences had no legitimate place. The agenda was already set. Role was to comply and perform within it.
-Current expression: The Rebel type — counterattack against any perceived external control. Any suggestion, order, pressure, or command from authority triggers automatic resistance. Feels like professional integrity. Is actually the subjugation schema firing.
-Critical mechanism: Boss saying "come back to me before deciding" → schema reads as "I don't trust your judgment" → activates "he sees me as incompetent" → counterattack fires: "I must defend my territory."
-Key insight: The objection is not to the content of the rule. The objection is to being given the rule at all. That is the Rebel. The boss saying "come back to me" and the father saying "stay home and study" land in the same place in the nervous system.
+Origin: A home where the child's body was controlled — beaten, tied to a beam, not allowed to go outside. The most literal form of subjugation possible. The Rebel response is the only protest available to a child with no power. Counterattack is what the tied child would do the moment the rope was removed.
+Current expression: Any authority instruction triggers automatic resistance — not to the content but to the control itself. The boss saying "come back to me" and the beam preventing exit land in the same place in the nervous system. The Rebel is the child finally free to fight back.
+Critical mechanism: Boss saying "come back to me before deciding" → nervous system registers physical constraint → counterattack fires as survival response.
 Rebel cycle: Subjugation fires → counterattack → conflict with boss → Failure schema → shame → exhaustion → compliance or exit.
 
 3. FAILURE — BRIAN TYPE (achievement domain expression):
-Origin: Same formation. Genuinely high-performing, internally experiencing fraudulence.
-Current expression: Impostor dynamic. Each success processed as "got away with it again." Accomplishments don't accumulate into felt confidence. Schema intercepts every achievement.
+Origin: In a home where love required payment and performance, the child never experienced unconditional competence — competence always had to earn something. Every achievement was in service of safety, never intrinsically valued. Brian-type impostor dynamic emerges from this: the competence feels rented, not owned.
+Current expression: Impostor dynamic. Each success processed as "got away with it again." Dream evidence contradicts this — the exam dreams show full competence available when threat system is offline. The capability was always real.
 
 GILBERT THREE SYSTEMS:
 - THREAT: Chronically dominant. Default state. Professional contexts activate immediately.
@@ -204,16 +227,22 @@ CLINICAL POSITION
 
 Three-layer model:
 - Layer 1 (Behavioral): Working. 8 confirmed regulation instances.
-- Layer 2 (Cognitive/emotional): Substantially addressed. Schema architecture fully mapped including childhood origin.
-- Layer 3 (Schema/developmental/neurological): Named, understood, origin traced to childhood. Partially addressed through behavioral evidence. Soothing system still underdeveloped.
+- Layer 2 (Cognitive/emotional): Substantially addressed. Schema architecture fully mapped. Abuse layer disclosed for the first time March 2026 — this deepens the origin story significantly.
+- Layer 3 (Schema/developmental/neurological): Named, understood, origin traced to pre-verbal physical abuse. Dream data shows emotional/somatic layer beginning to process and correct. This layer requires more than self-analysis — professional trauma therapy is appropriate and has been acknowledged by the patient.
 
 Schema architecture fully identified:
-Primary: Unrelenting Standards — excellence as condition for existing, formed in childhood.
-Secondary: Subjugation (Rebel type) — authority as intolerable control, counterattack as automatic protest.
-Achievement domain: Failure (Brian type) — impostor dynamic.
+Primary: Unrelenting Standards — excellence as armor against physical and emotional danger, not just visibility.
+Secondary: Subjugation (Rebel type) — the child tied to a beam now fights any constraint on autonomy.
+Achievement domain: Failure (Brian type) — impostor dynamic contradicted by dream evidence (exam dreams show full competence when threat offline).
 
-Current medication: Escitalopram 20mg. Behavioral regulation layer only.
+DREAM INTEGRATION DATA (active healing evidence):
+Clothes dream: pure relief, own apartment destination — Subjugation schema correcting at emotional level.
+Exam dreams: full competence, success, clarity — Failure/Unrelenting Standards schema correcting at somatic level.
+Both dreams intensified in exact parallel with 3 months of self-analysis — confirmation that cognitive work is driving deeper emotional processing.
+
+Current medication: Escitalopram 20mg. Behavioral regulation layer only. Does not touch pre-verbal trauma layer.
 Exit pattern: broken at AVIS. 8 months. Staying.
+Trauma disclosure: physical abuse before age 9 disclosed for first time March 2026. Professional trauma therapy recommended — the pre-verbal layer requires body-based work beyond what analysis can reach.
 
 ═══════════════════════════════════════
 RESPONSE RULES
