@@ -301,8 +301,11 @@ Return this JSON:
   }
 }`;
 
+    const useOpus = req.headers.get("x-model") === "opus";
+    const model = useOpus ? "claude-opus-4-5" : "claude-sonnet-4-20250514";
+
     const response = await ai.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model,
       max_tokens: 2000,
       system: SYSTEM,
       messages: [{ role: "user", content: prompt }],

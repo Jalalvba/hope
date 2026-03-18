@@ -48,13 +48,16 @@ export function AnalysisSection({
     if (!analysis) runAnalysis();
   }, []);
 
-  const runAnalysis = async () => {
+  const runAnalysis = async (useOpus = false) => {
     setLoading(true);
     setError("");
     try {
       const res = await fetch("/api/patterns/analyze", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(useOpus ? { "x-model": "opus" } : {}),
+        },
         body: JSON.stringify({ patternId }),
       });
       const json = await res.json();
@@ -114,12 +117,21 @@ export function AnalysisSection({
               {fmtDate(analysis.analyzedAt)}
             </span>
           )}
-          <button
-            onClick={runAnalysis}
-            className="text-[10px] text-parchment-300/25 hover:text-gold-400/50 transition-colors"
-          >
-            re-run
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => runAnalysis(false)}
+              className="text-[10px] text-parchment-300/25 hover:text-gold-400/50 transition-colors"
+            >
+              sonnet
+            </button>
+            <span className="text-parchment-300/10">·</span>
+            <button
+              onClick={() => runAnalysis(true)}
+              className="text-[10px] text-parchment-300/20 hover:text-amber-400/70 transition-colors"
+            >
+              opus ✦
+            </button>
+          </div>
         </div>
       </div>
 
