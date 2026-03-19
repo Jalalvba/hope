@@ -15,7 +15,7 @@ const COLOR: Record<string, { badge: string; border: string; belief: string }> =
 async function getPatterns(): Promise<Pattern[]> {
   const client = await clientPromise;
   return client.db("hope").collection<Pattern>("psy")
-    .find({ type: "pattern" }).sort({ id: 1 }).toArray()
+    .find({ type: "pattern" }).sort({ id: -1 }).toArray()
     .then((docs) => docs.map((d) => ({ ...d, _id: String(d._id) })));
 }
 
@@ -53,7 +53,7 @@ export default async function Home() {
         <div className="mb-8">
           <p className="text-[10px] text-parchment-300/30 uppercase tracking-widest mb-3">Recent entries</p>
           <div className="space-y-3">
-            {live.reverse().map((p) => (
+            {live.map((p) => (
               <PatternCard key={p.id} pattern={p} />
             ))}
           </div>
