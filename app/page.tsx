@@ -15,8 +15,10 @@ const COLOR: Record<string, { badge: string; border: string; belief: string }> =
 async function getPatterns(): Promise<Pattern[]> {
   const client = await clientPromise;
   return client.db("hope").collection<Pattern>("psy")
-    .find({ type: "pattern" }).sort({ id: -1 }).toArray()
-    .then((docs) => docs.map((d) => ({ ...d, _id: String(d._id) })));
+    .find({ type: "pattern" }).toArray()
+    .then((docs) => docs
+      .map((d) => ({ ...d, _id: String(d._id) }))
+      .sort((a, b) => parseInt(b.id.replace("P", "")) - parseInt(a.id.replace("P", ""))));
 }
 
 export default async function Home() {
