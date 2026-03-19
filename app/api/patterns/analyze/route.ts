@@ -125,7 +125,7 @@ This is specifically about EXPOSURE — being SEEN AS incompetent — not about 
 
 PROFESSIONAL HISTORY:
 - DEKRA: Feb 2015 — Dec 2022 (7yr 10mo) — formation site of root wound. Mastered every threat through anticipation and rumination. Prediction strategy worked in small contained environment. Could not leave — no offers. Exit finally came through opportunity matching real competence.
-- Super Auto/VW: Jan 2023 — Oct 2024 (21mo) — full autonomy given. Too many variables. Prediction strategy collapsed. Depression. Relapse on escitalopram. Left.
+- Super Auto/VW: Jan 2023 — Oct 2024 (21mo) — full autonomy given. Too many variables. Prediction strategy collapsed. After medication, Rebel erupted without calibration — was the only manager who rebelled openly against the director, over-argued, sometimes impolite. This cost him his position. Depression. Relapse on escitalopram. Left. Key lesson: post-medication Rebel without calibration is as destructive as pre-medication silence.
 - Groupe Auto Hall: Oct 2024 — Jul 2025 (9mo) — left on hierarchy conflict.
 - AVIS Maroc: Jul 2025 — present — 8 months. Currently staying, regulating, not running. First environment where new wiring is being built.
 - Core pattern identified: conflict with hierarchy triggered automatic exit. Pattern broken at AVIS — staying despite activation.
@@ -190,13 +190,27 @@ Origin: Physical control — tied to beam to prevent going outside. Father's anx
 Critical precision: The objection is not to the content of any instruction. The objection is to being given an instruction at all. The boss saying "come back to me before deciding" and the beam preventing play land in the same nervous system location.
 Rebel cycle: Subjugation fires → counterattack → conflict → Failure schema → shame → exhaustion → compliance or exit.
 
+BREAKTHROUGH INSIGHT — THE CLASSROOM-TO-AVIS CONNECTION (March 2026):
+This is the most precise formulation of the entire pattern architecture yet reached.
+
+AS A STUDENT: The patient could not say "I don't understand." Not because the teacher was frightening. Because saying it would mean losing the identity of being the competent, intelligent, first-in-class student — the ONLY currency keeping him safe in the family system. So he simulated focus. Performed understanding. Lost actual concentration because his energy was going into maintaining the IMAGE of competence rather than into actual learning. Went home and over-prepared alone. The autodidact superpower was not a gift — it was a survival strategy forced by the inability to be seen as not understanding.
+
+AT AVIS RIGHT NOW: Exact same structure in an adult body. Cannot say to Mehdi "I need guidance on this decision." Cannot be seen as a manager who has a defined scope rather than full authority. Must appear independent, powerful, competent, the one everyone talks about — even when it costs confrontation with the boss, even when it costs conflict with colleagues. The energy goes into maintaining the IMAGE of exceptional competence rather than into actually doing the work effectively.
+
+THE EQUATION: Student protecting his reputation as the smart one = Manager protecting his reputation as the competent one. Same structure. Same cost. Same reinforcement of the bad pattern. Same loss of actual effectiveness because the energy goes into image maintenance instead of real performance.
+
+THE SUPER AUTO CONFIRMATION: After medication removed the subjugation suppression, the Rebel erupted without calibration. Was the only manager who rebelled against the director openly. Argued everything, sometimes over-argued, sometimes impolite. The dynamic child finally free — but without the capacity to hold the tension between saying nothing and saying everything. This rebellion cost him his position at Super Auto. The Rebel confirmed: fighting authority gets you removed.
+
+MEDICATION AS PIVOTAL MOMENT: Before medication — silence, simulation, contain the Rebel. After medication — Rebel erupted, over-argued, confronted authority directly. At AVIS now — building the third state that neither pre-medication silence nor post-medication rebellion could achieve: disagreeing without being consumed by the disagreement. Stating position once, cleanly, without the Rebel taking over completely.
+
 UNDERLYING MECHANISM — MORE PRECISE THAN ANY SCHEMA LABEL:
 HYPERVIGILANT ANTICIPATION as survival strategy in chronically unpredictable environment.
 - Father's anxiety created unpredictable restrictions through fear narratives
 - Mother's displaced frustration created arbitrary physical danger
 - Family rules were invisible — had to be read through observation, not instruction
 - DEKRA confirmed: invisible rules exist, hierarchy protects itself, naivety is punished
-The inner voice is not a symptom of shame. It is the survival tool of a highly intelligent child who learned that predicting what happens next is the only available form of safety in an unpredictable environment. The problem: it never stopped running after the environment changed.
+- Classroom confirmed: admitting confusion costs you your only identity
+The inner voice is not a symptom of shame. It is the survival tool of a highly intelligent child who learned that predicting what happens next — and maintaining the image of someone who already knows — is the only available form of safety. The problem: it never stopped running after the environment changed.
 
 FAILURE — BRIAN TYPE (present but secondary):
 Impostor dynamic from competence always being in service of safety, never intrinsically valued. Contradicted by dream evidence — exam dreams show full competence available when threat offline. The capability was always real.
@@ -292,7 +306,10 @@ RESPONSE RULES
 - Reference the inherited cognitive system when relevant — father's catastrophizing vs patient's own intelligence.
 - Reference behavioral evidence when relevant to show real change.
 - Ground analysis in the provided clinical records from the RAG collections.
-- The goal is clarity then specific practice — not comfort.${rylContext}${mctContext}`;
+- The goal is clarity then specific practice — not comfort.
+- The classroom-to-AVIS equation is the most precise formulation available: student who couldn't say 'I don't understand' = manager who can't say 'I need guidance.' Apply this when relevant.
+- The patient is building the third state between pre-medication silence and post-medication rebellion — name this when relevant.
+- The autodidact capacity is a survival strategy, not a gift — acknowledge this when it appears.${rylContext}${mctContext}`;
 
     const prompt = `PATTERN TO ANALYZE:
 - ID: ${pattern.id}
@@ -308,7 +325,7 @@ ${(pattern as any).triggerContext ? `- Trigger context: ${(pattern as any).trigg
 Return this JSON:
 {
   "analyzedAt": "<ISO string>",
-  "summary": "<4-5 sentence clinical narrative: (1) name the exact schema — Unrelenting Standards, Subjugation-Rebel, or Failure, (2) trace it to childhood formation or DEKRA confirmation, (3) identify dominant Gilbert system and why, (4) name what the pattern functionally maintains>",
+  "summary": "<4-5 sentence clinical narrative: (1) name the exact schema — Unrelenting Standards, Subjugation-Rebel, or Failure, (2) trace it to the classroom-to-AVIS equation OR childhood formation OR DEKRA confirmation — whichever is most precise, (3) identify dominant Gilbert system and why, (4) name what the pattern functionally maintains — specifically whether it is protecting the IMAGE of competence at the cost of actual effectiveness>",
   "woundActivation": "<one sentence — how the childhood summer formation or DEKRA equation echoes in this specific activation>",
   "schemaActivated": ["Defectiveness" | "Failure" | "Unrelenting Standards" | "Subjugation"],
   "responseMode": "Surrender" | "Escape" | "Counterattack",
