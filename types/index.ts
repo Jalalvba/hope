@@ -13,6 +13,7 @@ export interface Pattern {
   cognitiveLabels: string[];
   note?: string;
   createdAt?: Date;
+  updatedAt?: Date;
   analysis?: PatternAnalysis;
 }
 
@@ -41,10 +42,11 @@ export interface PatternAnalysis {
   systemsInvolved: ("threat" | "drive" | "soothing")[];
   modesActive?: string[];
   schemaMaintenanceBelief?: string;
-  relatedPatterns: string[];
-  bookMappings: { concept: string; source: string; relevance: string }[];
   whatTheSchemaIsConstructing?: string;
   whatTheSituationActuallyNeeds?: string;
+  emotionalSchemaRunning?: string;           // NEW — Leahy layer
+  relatedPatterns: string[];
+  bookMappings: { concept: string; source: string; relevance: string }[];
   regulationEvidence?: string | null;
   practiceRecommendation: string;
   layerStatus?: {
