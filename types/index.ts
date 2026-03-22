@@ -16,6 +16,20 @@ export interface Pattern {
   analysis?: PatternAnalysis;
 }
 
+export interface HealingStep {
+  id: string;
+  source: string;
+  framework: string;
+  name: string;
+  what: string;
+  how: string;
+  when: string;
+  duration: string;
+  frequency: string;
+  successMarker: string;
+  whyThisPattern: string;
+}
+
 export interface PatternAnalysis {
   analyzedAt: Date;
   summary: string;
@@ -38,6 +52,7 @@ export interface PatternAnalysis {
     cognitive: string;
     schema: string;
   };
+  healingPath?: HealingStep[];
 }
 
 // ─── Color helper ─────────────────────────────────────────────────────────────

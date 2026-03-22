@@ -19,12 +19,15 @@ function scoreRecord(rec: Record<string, unknown>, keywords: string[]): number {
     toStr(rec.name), toStr(rec.description), toStr(rec.mechanism),
     toStr(rec.behavioral_signature), toStr(rec.tags), toStr(rec.concept_type),
     toStr(rec.what_activates_it), toStr(rec.intervention),
+    toStr(rec.schemaRelevance), toStr(rec.framework), toStr(rec.sourceShort),
+    toStr((rec.practice as Record<string, unknown>)?.what),
   ].join(" ").toLowerCase();
   return keywords.reduce((n, k) => n + (text.includes(k.toLowerCase()) ? 1 : 0), 0);
 }
 
 const RYL_PRIORITY = new Set(["response_mode", "emotional_pattern", "cognitive_pattern", "behavioral_pattern", "lifetrap_definition", "theoretical_model"]);
 const MCT_PRIORITY = new Set(["mechanism", "CAS_component", "positive_metacognitive_belief", "negative_metacognitive_belief", "DM_technique", "technique"]);
+const HP_PRIORITY = new Set(["activation_response_protocol", "daily_protocol", "schema_healing_exercise", "detached_mindfulness", "cognitive_defusion", "values_clarification", "confidence_building", "origin_reparenting"]);
 
 function pickTop(
   collection: Record<string, unknown>[],
@@ -54,6 +57,23 @@ function formatRecord(r: Record<string, unknown>): string {
       : String(r.intervention).slice(0, 200);
     parts.push(`Intervention: ${intv}`);
   }
+  return parts.join("\n");
+}
+
+function formatHPRecord(r: Record<string, unknown>): string {
+  const parts = [`[${r.concept_type}] ${r.name} (${r.sourceShort} — ${r.framework})`];
+  if (r.description) parts.push(`Description: ${String(r.description).slice(0, 300)}`);
+  if (r.mechanism) parts.push(`Mechanism: ${String(r.mechanism).slice(0, 250)}`);
+  const practice = r.practice as Record<string, string> | undefined;
+  if (practice) {
+    parts.push(`Practice — What: ${practice.what}`);
+    parts.push(`Practice — How: ${String(practice.how).slice(0, 300)}`);
+    parts.push(`Practice — When: ${practice.when}`);
+    parts.push(`Practice — Duration: ${practice.duration}`);
+    parts.push(`Practice — Frequency: ${practice.frequency}`);
+    parts.push(`Practice — Success marker: ${practice.successMarker}`);
+  }
+  if (r.schemaRelevance) parts.push(`Schema relevance: ${toStr(r.schemaRelevance)}`);
   return parts.join("\n");
 }
 
@@ -89,9 +109,10 @@ export async function POST(req: NextRequest) {
     const pattern = await db.collection<Pattern>("psy").findOne(buildQuery(patternId));
     if (!pattern) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-    const [rylRaw, mctRaw] = await Promise.all([
+    const [rylRaw, mctRaw, hpRaw] = await Promise.all([
       db.collection("ryl").find({}).toArray(),
       db.collection("mct").find({}).toArray(),
+      db.collection("hp").find({}).toArray(),
     ]);
 
     const keywords = extractKeywords(pattern);
@@ -102,12 +123,18 @@ export async function POST(req: NextRequest) {
     const mctRecords = mctRaw.length > 0
       ? pickTop(mctRaw as Record<string, unknown>[], keywords, 7, MCT_PRIORITY)
       : [];
+    const hpRecords = hpRaw.length > 0
+      ? pickTop(hpRaw as Record<string, unknown>[], keywords, 5, HP_PRIORITY)
+      : [];
 
     const rylContext = rylRecords.length > 0
       ? `\n\nRELEVANT SCHEMA THERAPY RECORDS (Young & Klosko — Reinventing Your Life):\n${rylRecords.map(formatRecord).join("\n\n")}`
       : "";
     const mctContext = mctRecords.length > 0
       ? `\n\nRELEVANT MCT RECORDS (Wells — Metacognitive Therapy):\n${mctRecords.map(formatRecord).join("\n\n")}`
+      : "";
+    const hpContext = hpRecords.length > 0
+      ? `\n\nHEALING PATH — VALIDATED EXERCISES FROM ALL FRAMEWORKS (Schema Therapy, MCT, ACT, CBT, CFT):\n${hpRecords.map(formatHPRecord).join("\n\n")}`
       : "";
 
     const SYSTEM = `You are a clinical psychologist operating at the intersection of three frameworks: Metacognitive Therapy (Wells), Schema Therapy (Young & Klosko), and Compassion-Focused Therapy (Gilbert & Choden). You have deep knowledge of this patient's complete psychological architecture built over three months of intensive self-analysis.
@@ -309,7 +336,8 @@ RESPONSE RULES
 - The goal is clarity then specific practice — not comfort.
 - The classroom-to-AVIS equation is the most precise formulation available: student who couldn't say 'I don't understand' = manager who can't say 'I need guidance.' Apply this when relevant.
 - The patient is building the third state between pre-medication silence and post-medication rebellion — name this when relevant.
-- The autodidact capacity is a survival strategy, not a gift — acknowledge this when it appears.${rylContext}${mctContext}`;
+- The autodidact capacity is a survival strategy, not a gift — acknowledge this when it appears.
+- HEALING PATH RULES: When Healing Path exercises are provided below, you MUST select 3-5 concrete exercises that are DIRECTLY relevant to this specific pattern activation. For each, explain WHY this exercise applies to THIS pattern. Pull the exact practice steps from the records. Do not invent exercises — use only what is provided. Prioritize: (1) immediate in-the-moment techniques, (2) daily practice protocols, (3) deeper processing work. The patient wants ACTION, not more insight. Every analysis must end with a clear path from understanding to practice.${rylContext}${mctContext}${hpContext}`;
 
     const prompt = `PATTERN TO ANALYZE:
 - ID: ${pattern.id}
@@ -350,15 +378,36 @@ Return this JSON:
     "behavioral": "<assessment of behavioral regulation in this activation>",
     "cognitive": "<did the patient separate operational fact from schema narrative?>",
     "schema": "<which formation is driving this and what would need to shift at the deepest level>"
-  }
-}`;
+  },
+  "healingPath": [
+    {
+      "id": "<exact id from the Healing Path record, e.g. RYL-01, MCT-03, TAP-02>",
+      "source": "<exact source string from the record>",
+      "framework": "<schema_therapy | mct | act | cbt | cft | integrated>",
+      "name": "<exact exercise name from the record>",
+      "what": "<exact practice.what from the record>",
+      "how": "<exact practice.how from the record — do NOT truncate>",
+      "when": "<exact practice.when from the record>",
+      "duration": "<exact practice.duration from the record>",
+      "frequency": "<exact practice.frequency from the record>",
+      "successMarker": "<exact practice.successMarker from the record>",
+      "whyThisPattern": "<1-2 sentences explaining WHY this specific exercise applies to THIS specific pattern activation — be precise, reference the pattern's activation mechanism>"
+    }
+  ]
+}
+
+HEALING PATH INSTRUCTIONS:
+- Select 3-5 exercises from the Healing Path records above. ORDER them: (1) immediate in-the-moment technique, (2) daily practice, (3) weekly review, (4) deeper schema work.
+- Use EXACT data from the records — do not paraphrase the practice steps.
+- The "whyThisPattern" field is the ONLY field you write — everything else comes from the record.
+- If no Healing Path records were provided, return an empty healingPath array.`;
 
     const useOpus = req.headers.get("x-model") === "opus";
     const model = useOpus ? "claude-opus-4-5" : "claude-sonnet-4-20250514";
 
     const response = await ai.messages.create({
       model,
-      max_tokens: 2000,
+      max_tokens: 4000,
       system: SYSTEM,
       messages: [{ role: "user", content: prompt }],
     });

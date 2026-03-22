@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { PatternAnalysis } from "@/types";
+import type { PatternAnalysis, HealingStep } from "@/types";
 
 const SCHEMA_CLS: Record<string, string> = {
   Defectiveness: "text-rust-400",
@@ -23,6 +23,110 @@ const SYS_CLS: Record<string, string> = {
 
 function fmtDate(d: Date | string) {
   return new Date(d).toLocaleDateString("fr-MA", { day: "2-digit", month: "short", year: "numeric" });
+}
+
+const FRAMEWORK_COLORS: Record<string, string> = {
+  schema_therapy: "text-amber-400/70 bg-amber-400/8 border-amber-400/15",
+  mct: "text-gold-400/70 bg-gold-400/8 border-gold-400/15",
+  act: "text-teal-400/70 bg-teal-400/8 border-teal-400/15",
+  cbt: "text-blue-400/70 bg-blue-400/8 border-blue-400/15",
+  cft: "text-rose-400/70 bg-rose-400/8 border-rose-400/15",
+  integrated: "text-violet-400/70 bg-violet-400/8 border-violet-400/15",
+};
+
+const FRAMEWORK_LABELS: Record<string, string> = {
+  schema_therapy: "Schema",
+  mct: "MCT",
+  act: "ACT",
+  cbt: "CBT",
+  cft: "CFT",
+  integrated: "Integrated",
+};
+
+const STEP_ICONS = ["⓵", "⓶", "⓷", "⓸", "⓹"];
+
+function HealingStepCard({ step, index }: { step: HealingStep; index: number }) {
+  const [expanded, setExpanded] = useState(index === 0);
+  const fwClass = FRAMEWORK_COLORS[step.framework] ?? "text-parchment-300/50 bg-parchment-300/5 border-parchment-300/10";
+  const fwLabel = FRAMEWORK_LABELS[step.framework] ?? step.framework;
+
+  return (
+    <div className="rounded-lg border border-sage-400/10 overflow-hidden transition-all">
+      {/* Header — always visible */}
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full flex items-start gap-2.5 px-3 py-2.5 text-left hover:bg-sage-400/3 transition-colors"
+      >
+        <span className="text-sage-400/50 text-sm mt-px shrink-0">{STEP_ICONS[index] ?? "·"}</span>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs text-parchment-200/80 font-medium">{step.name}</span>
+            <span className={`text-[9px] px-1.5 py-px rounded border font-mono ${fwClass}`}>
+              {fwLabel}
+            </span>
+          </div>
+          {step.whyThisPattern && (
+            <p className="text-[11px] text-sage-400/60 leading-relaxed mt-1 italic">
+              {step.whyThisPattern}
+            </p>
+          )}
+        </div>
+        <span className={`text-parchment-300/25 text-xs shrink-0 mt-0.5 transition-transform ${expanded ? "rotate-180" : ""}`}>
+          ▾
+        </span>
+      </button>
+
+      {/* Expanded — practice steps */}
+      {expanded && (
+        <div className="px-3 pb-3 pt-0 space-y-2.5 border-t border-sage-400/8">
+          {/* What */}
+          <div className="mt-2.5">
+            <p className="text-[9px] text-sage-400/45 uppercase tracking-widest mb-0.5">What to do</p>
+            <p className="text-xs text-parchment-200/75 leading-relaxed">{step.what}</p>
+          </div>
+
+          {/* How */}
+          <div>
+            <p className="text-[9px] text-sage-400/45 uppercase tracking-widest mb-0.5">How — step by step</p>
+            <p className="text-xs text-parchment-200/65 leading-relaxed">{step.how}</p>
+          </div>
+
+          {/* When / Duration / Frequency — compact row */}
+          <div className="flex flex-wrap gap-x-4 gap-y-1.5">
+            {step.when && (
+              <div>
+                <span className="text-[9px] text-parchment-300/30 uppercase tracking-widest">When </span>
+                <span className="text-[11px] text-parchment-200/55">{step.when}</span>
+              </div>
+            )}
+            {step.duration && (
+              <div>
+                <span className="text-[9px] text-parchment-300/30 uppercase tracking-widest">Duration </span>
+                <span className="text-[11px] text-parchment-200/55">{step.duration}</span>
+              </div>
+            )}
+            {step.frequency && (
+              <div>
+                <span className="text-[9px] text-parchment-300/30 uppercase tracking-widest">Frequency </span>
+                <span className="text-[11px] text-parchment-200/55">{step.frequency}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Success marker */}
+          {step.successMarker && (
+            <div className="bg-sage-400/5 rounded px-2.5 py-2 border border-sage-400/8">
+              <p className="text-[9px] text-sage-400/50 uppercase tracking-widest mb-0.5">You know it's working when</p>
+              <p className="text-[11px] text-sage-400/70 leading-relaxed">{step.successMarker}</p>
+            </div>
+          )}
+
+          {/* Source */}
+          <p className="text-[9px] text-parchment-300/20 font-mono">{step.source}</p>
+        </div>
+      )}
+    </div>
+  );
 }
 
 function Label({ children }: { children: React.ReactNode }) {
@@ -99,6 +203,7 @@ export function AnalysisSection({
   const relatedPatterns = Array.isArray(analysis.relatedPatterns) ? analysis.relatedPatterns : [];
   const bookMappings = Array.isArray(analysis.bookMappings) ? analysis.bookMappings : [];
   const casComponents = Array.isArray(analysis.casComponents) ? analysis.casComponents : [];
+  const healingPath = Array.isArray(analysis.healingPath) ? analysis.healingPath : [];
 
   return (
     <div className="glass rounded-xl p-5 space-y-5 border-l-2 border-gold-400/25">
@@ -346,6 +451,24 @@ export function AnalysisSection({
           <p className="text-xs text-parchment-200/70 leading-relaxed">
             {analysis.practiceRecommendation}
           </p>
+        </div>
+      )}
+
+      {/* ── Healing Path — Action Plan ── */}
+      {healingPath.length > 0 && (
+        <div className="space-y-3 pt-2">
+          <div className="flex items-center gap-2">
+            <span className="text-sage-400">⟡</span>
+            <span className="text-[10px] text-sage-400/70 uppercase tracking-widest font-medium">
+              Healing Path — Action Plan
+            </span>
+            <span className="text-[9px] text-parchment-300/25 font-mono ml-auto">
+              {healingPath.length} exercises
+            </span>
+          </div>
+          {healingPath.map((step, i) => (
+            <HealingStepCard key={step.id || i} step={step} index={i} />
+          ))}
         </div>
       )}
 

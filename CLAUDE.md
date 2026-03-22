@@ -35,6 +35,7 @@ Requires a `.env.local` with:
 | `fields` | Predefined dropdown options (coreBeliefs, symptoms, cognitiveLabels) |
 | `ryl` | *Reinventing Your Life* schema therapy reference data |
 | `mct` | Metacognitive Therapy reference data |
+| `hp` | Healing Path — validated exercises from all 5 books (Young, Wells, Ong/Twohig, Burns, Sokol/Fox) + integrated protocols |
 
 ### API Routes (`/app/api/patterns/`)
 - `route.ts` — GET all patterns, POST create new pattern (auto-increments ID: P12, P13...)
