@@ -203,6 +203,7 @@ export function AnalysisSection({
   const relatedPatterns = Array.isArray(analysis.relatedPatterns) ? analysis.relatedPatterns : [];
   const bookMappings = Array.isArray(analysis.bookMappings) ? analysis.bookMappings : [];
   const casComponents = Array.isArray(analysis.casComponents) ? analysis.casComponents : [];
+  const modesActive = Array.isArray(analysis.modesActive) ? analysis.modesActive : [];
   const healingPath = Array.isArray(analysis.healingPath) ? analysis.healingPath : [];
 
   return (
@@ -347,11 +348,22 @@ export function AnalysisSection({
         </div>
       )}
 
-      {/* ── Metacognitive belief ── */}
-      {analysis.positiveMetacognitiveBelief && (
+      {/* ── Schema maintenance belief ── */}
+      {analysis.schemaMaintenanceBelief && (
         <div className="bg-gold-400/5 border border-gold-400/10 rounded-lg px-3 py-2.5">
           <p className="text-[10px] text-gold-400/50 uppercase tracking-widest mb-1">
-            Belief keeping the voice running
+            Demanding Parent voice
+          </p>
+          <p className="text-xs text-parchment-200/70 leading-relaxed italic">
+            &quot;{analysis.schemaMaintenanceBelief}&quot;
+          </p>
+        </div>
+      )}
+      {/* Backwards compat: old MCT field */}
+      {!analysis.schemaMaintenanceBelief && analysis.positiveMetacognitiveBelief && (
+        <div className="bg-gold-400/5 border border-gold-400/10 rounded-lg px-3 py-2.5">
+          <p className="text-[10px] text-gold-400/50 uppercase tracking-widest mb-1">
+            Schema maintenance belief
           </p>
           <p className="text-xs text-parchment-200/70 leading-relaxed italic">
             &quot;{analysis.positiveMetacognitiveBelief}&quot;
@@ -359,8 +371,24 @@ export function AnalysisSection({
         </div>
       )}
 
-      {/* ── CAS components ── */}
-      {casComponents.length > 0 && (
+      {/* ── Modes active ── */}
+      {modesActive.length > 0 && (
+        <div>
+          <Label>Modes active</Label>
+          <div className="flex flex-wrap gap-1.5">
+            {modesActive.map((m) => (
+              <span
+                key={m}
+                className="text-[10px] px-2 py-0.5 rounded bg-amber-400/6 text-amber-400/50 font-mono border border-amber-400/10"
+              >
+                {m.replace(/_/g, " ")}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+      {/* Backwards compat: old CAS field */}
+      {modesActive.length === 0 && casComponents.length > 0 && (
         <div>
           <Label>CAS components active</Label>
           <div className="flex flex-wrap gap-1.5">

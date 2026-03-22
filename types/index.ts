@@ -39,8 +39,8 @@ export interface PatternAnalysis {
   operationalFact?: string;
   schemaNarrative?: string;
   systemsInvolved: ("threat" | "drive" | "soothing")[];
-  casComponents?: string[];
-  positiveMetacognitiveBelief?: string;
+  modesActive?: string[];
+  schemaMaintenanceBelief?: string;
   relatedPatterns: string[];
   bookMappings: { concept: string; source: string; relevance: string }[];
   whatTheSchemaIsConstructing?: string;

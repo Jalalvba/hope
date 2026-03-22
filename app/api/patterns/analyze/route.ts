@@ -26,7 +26,6 @@ function scoreRecord(rec: Record<string, unknown>, keywords: string[]): number {
 }
 
 const RYL_PRIORITY = new Set(["response_mode", "emotional_pattern", "cognitive_pattern", "behavioral_pattern", "lifetrap_definition", "theoretical_model"]);
-const MCT_PRIORITY = new Set(["mechanism", "CAS_component", "positive_metacognitive_belief", "negative_metacognitive_belief", "DM_technique", "technique"]);
 const HP_PRIORITY = new Set(["limited_reparenting", "imagery_rescripting", "chair_work", "schema_mode_identification", "mode_cycle_interruption", "behavioral_pattern_breaking", "empathic_confrontation", "schema_flashcard", "cognitive_strategy", "core_emotional_needs", "emotional_schema", "deliberate_practice", "integrated_protocol", "relationship_pattern", "mindfulness_schema"]);
 
 function pickTop(
@@ -109,9 +108,8 @@ export async function POST(req: NextRequest) {
     const pattern = await db.collection<Pattern>("psy").findOne(buildQuery(patternId));
     if (!pattern) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-    const [rylRaw, mctRaw, hpRaw] = await Promise.all([
+    const [rylRaw, hpRaw] = await Promise.all([
       db.collection("ryl").find({}).toArray(),
-      db.collection("mct").find({}).toArray(),
       db.collection("hp").find({}).toArray(),
     ]);
 
@@ -120,24 +118,18 @@ export async function POST(req: NextRequest) {
     const rylRecords = rylRaw.length > 0
       ? pickTop(rylRaw as Record<string, unknown>[], keywords, 7, RYL_PRIORITY)
       : [];
-    const mctRecords = mctRaw.length > 0
-      ? pickTop(mctRaw as Record<string, unknown>[], keywords, 7, MCT_PRIORITY)
-      : [];
     const hpRecords = hpRaw.length > 0
-      ? pickTop(hpRaw as Record<string, unknown>[], keywords, 5, HP_PRIORITY)
+      ? pickTop(hpRaw as Record<string, unknown>[], keywords, 7, HP_PRIORITY)
       : [];
 
     const rylContext = rylRecords.length > 0
       ? `\n\nRELEVANT SCHEMA THERAPY RECORDS (Young & Klosko — Reinventing Your Life):\n${rylRecords.map(formatRecord).join("\n\n")}`
       : "";
-    const mctContext = mctRecords.length > 0
-      ? `\n\nRELEVANT MCT RECORDS (Wells — Metacognitive Therapy):\n${mctRecords.map(formatRecord).join("\n\n")}`
-      : "";
     const hpContext = hpRecords.length > 0
       ? `\n\nHEALING PATH — SCHEMA THERAPY EXERCISES (from 18-book reference library):\n${hpRecords.map(formatHPRecord).join("\n\n")}`
       : "";
 
-    const SYSTEM = `You are a clinical psychologist operating at the intersection of three frameworks: Metacognitive Therapy (Wells), Schema Therapy (Young & Klosko), and Compassion-Focused Therapy (Gilbert & Choden). You have deep knowledge of this patient's complete psychological architecture built over three months of intensive self-analysis.
+    const SYSTEM = `You are a clinical psychologist specialized in Schema Therapy, drawing from an 18-book reference library including Young, Klosko & Weishaar (Practitioner's Guide), Arntz & Jacob (Mode Approach), Rafaeli, Bernstein & Young (Distinctive Features), Roediger (Contextual ST), Jacob (Breaking Negative Thinking Patterns), Farrell & Shaw (Clinician's Guide), Leahy (Emotional Schema Therapy), van Vreeswijk (Mindfulness & ST), and Behary & Farrell (Deliberate Practice). You also use Gilbert's three-system model (threat/drive/soothing) as a complementary lens. You have deep knowledge of this patient's complete psychological architecture built over three months of intensive self-analysis.
 
 ═══════════════════════════════════════
 PATIENT ARCHITECTURE — READ BEFORE ANALYZING
@@ -337,7 +329,7 @@ RESPONSE RULES
 - The classroom-to-AVIS equation is the most precise formulation available: student who couldn't say 'I don't understand' = manager who can't say 'I need guidance.' Apply this when relevant.
 - The patient is building the third state between pre-medication silence and post-medication rebellion — name this when relevant.
 - The autodidact capacity is a survival strategy, not a gift — acknowledge this when it appears.
-- HEALING PATH RULES: When Healing Path exercises are provided below, you MUST select 3-5 concrete exercises that are DIRECTLY relevant to this specific pattern activation. For each, explain WHY this exercise applies to THIS pattern. Pull the exact practice steps from the records. Do not invent exercises — use only what is provided. Prioritize: (1) immediate in-the-moment techniques, (2) daily practice protocols, (3) deeper processing work. The patient wants ACTION, not more insight. Every analysis must end with a clear path from understanding to practice.${rylContext}${mctContext}${hpContext}`;
+- HEALING PATH RULES: When Healing Path exercises are provided below, you MUST select 3-5 concrete exercises that are DIRECTLY relevant to this specific pattern activation. For each, explain WHY this exercise applies to THIS pattern. Pull the exact practice steps from the records. Do not invent exercises — use only what is provided. Prioritize: (1) immediate in-the-moment techniques, (2) daily practice protocols, (3) deeper processing work. The patient wants ACTION, not more insight. Every analysis must end with a clear path from understanding to practice. Use ONLY Schema Therapy concepts and language — do NOT reference MCT, ACT, CBT, or other frameworks.${rylContext}${hpContext}`;
 
     const prompt = `PATTERN TO ANALYZE:
 - ID: ${pattern.id}
@@ -360,13 +352,13 @@ Return this JSON:
   "operationalFact": "<what is actually true in the situation, separated from schema narrative>",
   "schemaNarrative": "<what the schema constructed on top of the operational fact>",
   "systemsInvolved": ["threat" | "drive" | "soothing"],
-  "casComponents": ["rumination" | "threat_monitoring" | "thought_suppression" | "reassurance_seeking" | "defense_rehearsal" | "verdict_simulation" | "positive_metacognitive_belief_running"],
-  "positiveMetacognitiveBelief": "<the specific belief keeping the inner voice running in this activation>",
+  "modesActive": ["Demanding_Parent" | "Vulnerable_Child" | "Angry_Rebel_Child" | "Detached_Protector" | "Compliant_Surrender" | "Healthy_Adult"],
+  "schemaMaintenanceBelief": "<the specific belief maintaining the schema in this activation — what the Demanding Parent is saying>",
   "relatedPatterns": ["P1" through "P16" — all that share the same underlying mechanism],
   "bookMappings": [
     {
-      "concept": "<exact concept name from the provided records>",
-      "source": "<exact source string from the record>",
+      "concept": "<exact concept name from the provided schema therapy records>",
+      "source": "<exact source string from the record — must be a schema therapy book>",
       "relevance": "<one precise sentence connecting this concept to this specific activation>"
     }
   ],
