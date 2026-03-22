@@ -27,7 +27,7 @@ function scoreRecord(rec: Record<string, unknown>, keywords: string[]): number {
 
 const RYL_PRIORITY = new Set(["response_mode", "emotional_pattern", "cognitive_pattern", "behavioral_pattern", "lifetrap_definition", "theoretical_model"]);
 const MCT_PRIORITY = new Set(["mechanism", "CAS_component", "positive_metacognitive_belief", "negative_metacognitive_belief", "DM_technique", "technique"]);
-const HP_PRIORITY = new Set(["activation_response_protocol", "daily_protocol", "schema_healing_exercise", "detached_mindfulness", "cognitive_defusion", "values_clarification", "confidence_building", "origin_reparenting"]);
+const HP_PRIORITY = new Set(["limited_reparenting", "imagery_rescripting", "chair_work", "schema_mode_identification", "mode_cycle_interruption", "behavioral_pattern_breaking", "empathic_confrontation", "schema_flashcard", "cognitive_strategy", "core_emotional_needs", "emotional_schema", "deliberate_practice", "integrated_protocol", "relationship_pattern", "mindfulness_schema"]);
 
 function pickTop(
   collection: Record<string, unknown>[],
@@ -134,7 +134,7 @@ export async function POST(req: NextRequest) {
       ? `\n\nRELEVANT MCT RECORDS (Wells — Metacognitive Therapy):\n${mctRecords.map(formatRecord).join("\n\n")}`
       : "";
     const hpContext = hpRecords.length > 0
-      ? `\n\nHEALING PATH — VALIDATED EXERCISES FROM ALL FRAMEWORKS (Schema Therapy, MCT, ACT, CBT, CFT):\n${hpRecords.map(formatHPRecord).join("\n\n")}`
+      ? `\n\nHEALING PATH — SCHEMA THERAPY EXERCISES (from 18-book reference library):\n${hpRecords.map(formatHPRecord).join("\n\n")}`
       : "";
 
     const SYSTEM = `You are a clinical psychologist operating at the intersection of three frameworks: Metacognitive Therapy (Wells), Schema Therapy (Young & Klosko), and Compassion-Focused Therapy (Gilbert & Choden). You have deep knowledge of this patient's complete psychological architecture built over three months of intensive self-analysis.
