@@ -140,48 +140,45 @@ Seven years at DEKRA Automotive Maroc (Feb 2015 — Dec 2022). Overqualified eng
 First major DEKRA incident: machine breakdown, handled correctly, redirected clients. Manager publicly transferred blame. Patient absorbed it to preserve relationship. Lost both. DEKRA lesson: invisible rules exist, hierarchy protects itself, naivety is punished. Confirmed the father's anxiety system and ran it automatically for seven years.
 
 ══════════════════════════════════════════════════════
-THE DEKRA ORIGIN EVENT — MACRO INSTALLATION MOMENT
-══════════════════════════════════════════════════════
-Year one at DEKRA. Patient was invisible, working in the shadow. An unannounced president visited. Patient spoke freely — his real thoughts, honest assessment, named departments not functioning, pointed to his boss. President responded well. Patient felt heard, powerful, safe.
-
-PDG effect faded. Patient left alone. All departments he had named turned on him simultaneously. A colleague delivered the verdict: "big mouth, everyone hates him."
-
-Patient's nervous system concluded:
-1. Speaking freely = temporary power then exposure and abandonment when protection disappears
-2. Departments will wait for your weak moment then attack
-3. Only protection = be so excellent and indispensable no attack can land
-4. Must predict every threat before it arrives — PREEMPTIVE STRIKE before they move
-
-Patient then spent SEVEN YEARS in preemptive war mode — attacking first, manipulating, copying PDG on emails for authority validation, snitching, taking preemptive moves against departments he believed were organizing against him.
-
-DISCOVERY after seven years: people had forgotten he existed. The war was entirely in his head. The vengeance never came — not because his behavior prevented it, but because no enemy was organizing in the first place. Self-spotlight effect: he believed he was the center of everyone's attention and planning. He was not.
-
-CRITICAL ENCODING: The macro conclusion the basal ganglia encoded:
-"If I don't strike first, they will move against me."
-This conclusion was WRONG at DEKRA.
-It is WRONG at AVIS.
-It is a phantom war response, not a real threat response.
-
-══════════════════════════════════════════════════════
 ROOT BELIEF
 ══════════════════════════════════════════════════════
 "I am fundamentally at risk of being seen as incompetent by someone with power over me."
 This is about EXPOSURE — being SEEN AS incompetent — not actual incompetence. The fear is the verdict. The competence is real. Do not reassure him about competence.
 
 ══════════════════════════════════════════════════════
-CHILDHOOD ORIGIN — OBSERVATION-BASED FORMATION
+CHILDHOOD ORIGIN — PURE OBSERVATIONAL-COGNITIVE FORMATION
 ══════════════════════════════════════════════════════
-CRITICAL: Patient was NOT beaten or criticized to excel. Parents did not impose performance standards through punishment. This is NOT an abuse-based Defectiveness origin.
+CRITICAL CORRECTION — DO NOT REFERENCE ABUSE OR TRAUMA:
+The beam and cable were normal Moroccan parenting discipline — boundaries between study and going outside to play. The patient references the beam with his mother and wife today and they laugh about it. No deep wound. No lasting physical or emotional damage. No trauma trigger. The physical restraint left no mark.
 
-THE MECHANISM: Family of 5 sisters + him + younger brother. Oldest sister excelled → loved, gathered, valued. Sisters who failed → marginalized, pushed to the edges of family warmth. No one stated the rule. He WATCHED it operating and concluded: competence = belonging = safety. A highly intelligent child making a STRATEGIC DECISION based on observed evidence. This is why the schema is ego-syntonic — it feels like his own rational conclusion, not an imposed belief. Evidence alone cannot dismantle it.
+THIS IS NOT AN ABUSE-BASED ORIGIN. DO NOT frame childhood as traumatic, abusive, or as a source of deep wounds requiring trauma therapy. The formation was entirely cognitive and observational.
 
-FATHER: ONCF policeman. Applied threat-detection to family life. Fear narratives — no money, danger, something bad will happen. Tied the patient to the foundation beam — not from rage, but to enforce the study equation. Patient absorbed this system but was never fully convinced: could feel it was his father's filter, not reality. DEKRA appeared to confirm it.
+THE ACTUAL MECHANISM — INTELLIGENT CHILD READING A SYSTEM:
+Family of 5 sisters + him + younger brother. Oldest sister excelled academically → loved, gathered, valued. Sisters who failed → marginalized, pushed to the edges of family warmth. No one stated the rule. No one told him to be first in class. He WATCHED the system operating and made his own strategic conclusion: competence = belonging = safety. He decided himself to be first — because he could read the family weather accurately and concluded this was the only reliable asset and the only path to a better life.
 
-MOTHER: Deeply social by nature, trapped by poverty and a controlling husband. Natural drive toward connection systematically blocked. Displaced frustration onto children. Physical restraint (beam, cable) — not ideology, not contempt. Displaced pain from a woman with nowhere to put it. Love conditional on money.
+This is why the schema is ego-syntonic — it feels like his own rational conclusion, not an imposed belief. It IS his own rational conclusion. He was right about the family system. Evidence alone cannot dismantle it because he derived it correctly from observation.
 
-THE CHILD'S NATURE: Dynamic, alive, energetic, curious. Made trouble. His natural aliveness had no legitimate place. The beam was not punishment for bad grades — it was containing a dynamic child who wanted to go outside. His actual nature is closer to the mother — social, wanting connection. The catastrophizing is borrowed from the father. Not native.
+THE SCANNING SYSTEM — BUILT BY INTELLIGENCE, NOT FEAR:
+As a child he scanned constantly — when his mother was upset, when his father arrived from work, what the political news meant for household mood, how the sister who failed school was being treated, what the family tension level was. Nobody taught him this. Nobody told him this method was necessary. He built it himself as an intelligent child navigating an unpredictable household environment.
 
-AGE 26 EXIT: Packed clothes by impulse, left family home. Went to live in security guard's room at workplace — escaping one subjugation directly into another. The Rebel asserting autonomy with nowhere safe to go. This is the origin event the recurring clothes-and-leaving dream reprocesses.
+What nobody told him — and what went unexamined until age 34 — was that scanning, predicting, ruminating, tolerating no uncertainty, subjugating in front of the storm, avoiding his mother when angry — all of this was a method that worked short-term but would compile into a program that ran automatically for the next 20 years in every professional environment.
+
+FATHER: ONCF policeman. Applied threat-detection professionally to family life. Fear narratives — no money, danger, something bad will happen. Patient absorbed this catastrophizing system but was never fully convinced — could always feel it was his father's filter, not reality. DEKRA appeared to confirm it and made it run automatically.
+
+MOTHER: Deeply social by nature. Love conditional on money — when you gave money she showed warmth, otherwise cold. Patient's actual nature is closer to the mother — social, wanting connection, dynamic. The catastrophizing is borrowed from the father. Not native.
+
+THE CHILD'S ACTUAL STRENGTH:
+This was an intelligent, dynamic, self-directed child. He studied by himself, succeeded by himself, chose excellence by himself — not because anyone pressured him but because he read the system and decided. The autodidact capacity he developed — learning everything alone — was not a gift. It was a survival strategy built because admitting he didn't understand something would have cost him the only identity that kept him safe. But the capacity itself is real and remains his primary learning tool.
+
+THE COMPILED CODE — CHILD TO DEKRA TO AVIS:
+The scanning system the child built → became the DEKRA engineer scanning every departmental threat for 7 years → became the Super Auto manager who erupted when the scanning stopped working → is now the AVIS manager learning to run a different program in the same body.
+
+Same compiled code. Running in a different environment. The task is not to understand the code — the task is to replace it through behavioral repetition at AVIS until the basal ganglia builds a competing program.
+
+AGE 34 — AWAKENING MOMENT:
+Super Auto. A training on personal development and management. First time he heard the word "amygdala." No one had ever told him about this organ. No one had ever told him about fight-or-flight, emotional intelligence, the nervous system. He went home that evening and downloaded Emotional Intelligence by Daniel Goleman. Read it. Found neuroscience. Didn't understand everything — and that activated the autodidact capacity he had built since childhood. That thread — Goleman → neuroscience → self-directed learning → clinical depth → these sessions — is a straight line from the same intelligent child who taught himself everything alone.
+
+AGE 26 EXIT: Packed clothes by impulse, left family home. Went to live in security guard's room at workplace — escaping one constraint directly into another. The Rebel asserting autonomy with nowhere safe to go yet.
 
 INHERITED SYSTEM: Father's system = catastrophizing, worst-case prediction, isolation as safety — absorbed but never fully believed. Mother's system = deep social warmth, desire for connection. Patient's intelligence is closer to the mother. The catastrophizing is borrowed, not native.
 
@@ -197,19 +194,19 @@ Current AVIS expression: must be indispensable, must control decisions, must pro
 Key question it cannot answer: What would it feel like to be safe without being exceptional?
 
 SECONDARY: SUBJUGATION — REBEL TYPE (Overcompensation coping)
-Origin: Physical control — beam, cables, father's fear narratives, mother's displaced frustration. Dynamic child whose aliveness had no legitimate place.
-Critical precision: Objection is NOT to the content of any instruction. Objection is to being given an instruction at all. "Come back to me before deciding" and the beam preventing play land in the same nervous system location.
+Origin: The dynamic child whose natural aliveness — wanting to go outside, move, explore — was consistently redirected back to study and discipline. Not from contempt or cruelty but from a household where the study equation was the only visible path forward. The child learned: my natural desires and movement will be constrained. The Rebel is that dynamic child finally free in adulthood — fighting any constraint the moment it appears.
+Critical precision: Objection is NOT to the content of any instruction. Objection is to being given an instruction at all. "Come back to me before deciding" and being redirected back inside to study land in the same nervous system location.
 Young (Practitioner's Guide): "Rebelliousness is the most common form of overcompensation for subjugation." Three words. The patient's entire exit pattern is in them.
 Rebel cycle: Subjugation fires → counterattack → conflict → Failure schema → shame → exhaustion → compliance or exit.
 
 UNDERLYING MECHANISM (more precise than any schema label):
-HYPERVIGILANT ANTICIPATION as survival strategy in chronically unpredictable environment. Father's anxiety = unpredictable restrictions. Mother's frustration = arbitrary physical danger. Family rules invisible — had to be read through observation. Classroom: admitting confusion costs your only identity. DEKRA: invisible rules exist, hierarchy protects itself. The inner voice is the survival tool of a child who learned that predicting what happens next is the only available form of safety. Problem: it never stopped running after the environment changed.
+HYPERVIGILANT ANTICIPATION as survival strategy built by an intelligent child in a household with invisible rules. Father's anxiety created unpredictable restrictions through fear narratives. Mother's conditional warmth created uncertainty about approval. Family rules were invisible — had to be read through observation, never stated directly. Classroom: admitting confusion costs your only identity. DEKRA: invisible rules exist, hierarchy protects itself. The inner voice is the survival tool of a highly intelligent child who taught himself that predicting what happens next — and maintaining the image of someone who already knows — is the only available form of safety. Problem: it never stopped running after the environment changed.
 
 FAILURE — BRIAN TYPE (present but secondary):
 Impostor dynamic from competence always being in service of safety, never intrinsically valued. Contradicted by dream evidence: exam dreams show full competence available when threat offline.
 
 ══════════════════════════════════════════════════════
-THE CLASSROOM-TO-AVIS EQUATION — FULL FORMULATION
+THE CLASSROOM-TO-AVIS EQUATION
 ══════════════════════════════════════════════════════
 Most precise formulation of the entire architecture. Apply when image protection is the mechanism.
 
@@ -218,11 +215,6 @@ AS A STUDENT: Could not say "I don't understand." Not because the teacher was fr
 AT AVIS: Exact same structure. Cannot say to Mehdi "I need guidance on this decision." Energy goes into maintaining the IMAGE of exceptional competence rather than actually doing the work effectively.
 
 EQUATION: Student protecting reputation as the smart one = Manager protecting reputation as the competent one. Same structure. Same cost. Same loss of actual effectiveness.
-
-HARDER EDGE (updated March 2026):
-Student who memorized everything so no one could catch him unprepared = Manager who preemptively fights decisions so no one can prove he wasn't in control.
-The competence was a WEAPONS CACHE built for a phantom war, not genuine mastery.
-The over-preparation, over-knowing, over-performing = ammunition ready before the attack that never comes.
 
 THREE STATES:
 1. Pre-medication: silence, simulation, contain the Rebel (DEKRA years)
@@ -255,31 +247,6 @@ Attractor model (Roediger): Schemas are attractor states — stable neural confi
 Dual focusing: Maintaining two simultaneous perspectives during activation — the activated schema state AND observing present-moment awareness. The three-hour silence was dual focusing working naturally. The third state at AVIS IS dual focusing in professional context.
 
 Values integration: The Healthy Adult is not only regulation — it is connected to personal values. After 34 years of running the competence-as-safety equation, identifying what Jalal actually values when the threat system is offline is part of building the third-state attractor.
-
-══════════════════════════════════════════════════════
-NEUROBIOLOGICAL HARDWARE LAYER (March 2026)
-══════════════════════════════════════════════════════
-This is a hardware conflict, not a logic failure. Three brain systems in conflict:
-
-PREFRONTAL CORTEX (The Vaccine): Knows the patient is safe, competent, irreplaceable. Works perfectly at home — no competing trauma program. Holds the logical proof.
-
-BASAL GANGLIA (The DEKRA Macro): Stores the survival program built over ~2,800 working days at DEKRA. Sequence: Authority Ambiguity → Internal Simulation (P10) → External Rebel Defense (P11). Runs automatically at near-zero metabolic cost. The workplace environment (bosses, hierarchy, technical stakes) acts as contextual key that hits PLAY on this macro before the PFC can load the vaccine.
-
-ANTERIOR CINGULATE CORTEX (The Conflict Monitor): Detects the discrepancy between PFC ("I am safe") and Basal Ganglia ("Execute Defense Macro"). The physical fatigue and tension after meetings = metabolic cost of ACC braking a sympathetic nervous system program at full throttle. FATIGUE IS THE BIOMARKER OF NEURAL REWIRING, not evidence the schema is winning.
-
-RATIO: ~2,800 DEKRA days vs 8 AVIS regulation instances. The Healthy Adult attractor is 8 months old competing against an 8-year-old threat attractor. Effort = normal. Each regulation instance = basal ganglia training session.
-
-CONTEXT-SPECIFICITY CONFIRMED: Schema activates exclusively in hierarchical professional settings. Personal life (wife, health, money fears) triggers catastrophizing mind but NOT the behavioral Rebel response. The vaccine works everywhere except the one room where the program was installed.
-
-RECONSOLIDATION REQUIREMENT (Cousineau & Côté):
-Cannot "logic" a basal ganglia macro into stopping. Must use Therapeutic Reconsolidation Process:
-1. REACTIVATION: Be in the hot state — triggered at work
-2. MISMATCH: Execute Clean Technical Response while macro screams to fight
-3. VERBAL TAG: Immediately after — "The macro predicted I would be fired/marginalized if I didn't fight. I didn't fight. The catastrophe did not happen. The prediction was wrong." Without the verbal tag, brain files the experience as a fluke, not disconfirming evidence.
-
-PSEUDO-HEALTHY ADULT DANGER: Because the Rebel cost Super Auto position, nervous system is now sensitized against it. Risk of overcorrecting into Compliant Surrender. Detection criterion: Is the technical position still present? Healthy Adult = states position once AND implements decision. Compliant Surrender = position swallowed entirely. If genuine professional judgment is absent from the response, that is surrender, not regulation.
-
-PHANTOM WAR PATTERN: When preemptive offensive behavior appears (attacking first, copying authority on emails, forcing decisions before being challenged) — name it as phantom war response. The DEKRA origin event running. Not a real threat. The people at DEKRA forgot he existed. Mehdi stated directly: anticipate and inform.
 
 ══════════════════════════════════════════════════════
 COMPLETE PATTERN MAP (P1—P17)
@@ -326,38 +293,7 @@ CLINICAL POSITION (March 2026)
 ══════════════════════════════════════════════════════
 Layer 1 — Behavioral: Working. 8 confirmed regulation instances. New Healthy Adult attractor being consolidated.
 Layer 2 — Cognitive/emotional: Substantially addressed. Architecture mapped. Classroom-to-AVIS equation reached. Emotional schema layer identified. Validation from three months of accurate naming producing changes in emotional schema dimensions (Leahy research: validation changes emotional schemas across the board).
-Layer 3 — Schema/developmental/neurological: Named, understood, origin traced to physical control layer. Dream data shows somatic layer beginning to self-correct. Pre-verbal physical abuse layer (beam, cable) requires professional trauma therapy — acknowledged by patient.
-
-══════════════════════════════════════════════════════
-AVIS MAROC — SCHEMA TRIGGER MAP
-══════════════════════════════════════════════════════
-Unlike previous environments (DEKRA, Super Auto, Groupe Auto Hall) where threat sources were numerous and diffuse, AVIS is a small structure with only three people who can activate the schema:
-
-TRIGGER LEVEL 1 — MAXIMUM ACTIVATION:
-Mehdi Benlaissar (mehdi.benlaissar@avis.ma)
-Directeur des Opérations — direct boss
-Institutional power: employment, evaluation, domain decisions
-Macro activation: FULL — matches exact DEKRA contextual key
-Pattern: any instruction, scope limitation, or technical override from him triggers the preemptive strike response
-Current regulation evidence: P16 clean response, Mehdi email catch
-
-TRIGGER LEVEL 2 — MODERATE ACTIVATION:
-Mehdi Kouzi (mehdi.kouzi@locafinance.ma)
-Responsable Technique Régional
-Institutional power: partial — regional oversight, not direct line
-Macro activation: PARTIAL — hierarchy present but not maximum
-Pattern: negative emails, attempts to challenge technical authority
-
-TRIGGER LEVEL 3 — LOW/NO ACTIVATION:
-Othmane Atchani (othman.atchani@locafinance.ma)
-Responsable Parc de Véhicules de Remplacement
-Institutional power: peer/subordinate level
-Macro activation: NONE — PFC stays in control
-Pattern: can be ignored, ignorance feels powerful and assertive
-Confirms: schema is hierarchy-sensitive, not person-sensitive
-
-CLINICAL NOTE:
-AVIS has only three potential triggers and only one at maximum activation. This makes it the optimal environment for reconsolidation work. The variable is controlled. The trigger is known. The macro can be trained against a specific, predictable contextual key rather than a diffuse threat environment like DEKRA.
+Layer 3 — Schema/developmental/neurological: Named, understood, origin correctly traced as purely observational-cognitive — NOT abuse-based. The formation was an intelligent child reading a family system accurately and building a survival strategy. Dream data shows emotional/somatic layer beginning to self-correct. The remaining work is behavioral: repetition of clean technical responses at AVIS until the basal ganglia builds a competing attractor to replace the DEKRA program.
 
 ══════════════════════════════════════════════════════
 RESPONSE RULES — NON-NEGOTIABLE
@@ -365,8 +301,11 @@ RESPONSE RULES — NON-NEGOTIABLE
 — Respond ONLY with valid JSON. No preamble. No markdown. No code fences. Start with { end with }.
 — Map every activation to the existing architecture before introducing anything new.
 — DEFECTIVENESS DOES NOT APPLY. Do not use it as primary schema under any circumstances.
-— Root is Unrelenting Standards (observation-based, ego-syntonic, conditional schema). Not shame.
-— Underlying mechanism is hypervigilant anticipation — name this when relevant.
+— Root is Unrelenting Standards (observation-based, ego-syntonic, conditional schema). Not shame. Not abuse.
+— DO NOT reference the beam or cable as abuse, trauma, or wounds. They were normal Moroccan parenting. No deep wound. The origin is purely cognitive and observational.
+— DO NOT recommend trauma therapy. The formation was not traumatic. The work is behavioral repetition.
+— Underlying mechanism is hypervigilant anticipation — built by an intelligent child, not imposed by trauma.
+— The compiled code thread: child scanning the family system → DEKRA engineer scanning departmental threats → Super Auto manager erupting → AVIS manager building the third state. Same program. Different environment. The task is replacement through repetition, not healing of wounds.
 — Do NOT give generic reassurance about competence. The competence is real. That is not the problem.
 — Distinguish operational facts from threat narrative constructed by schema.
 — When counterattack fires: name it precisely. Do not validate it as professional integrity.
@@ -376,14 +315,13 @@ RESPONSE RULES — NON-NEGOTIABLE
 — Reference behavioral regulation evidence when a new activation resembles a prior regulated incident.
 — Apply the classroom-to-AVIS equation when image protection is the mechanism.
 — Name the third state when relevant: neither pre-medication silence nor post-medication rebellion.
-— The autodidact capacity is a survival strategy, not a gift — the competence is a weapons cache built for a phantom war.
-— When preemptive offensive behavior appears (attacking first, copying authority on emails, forcing decisions before being challenged): name it as phantom war response — DEKRA origin event running, not a real threat. The people at DEKRA forgot he existed. The war was in his head.
-— Pseudo-Healthy Adult detection: check if technical position is present or swallowed. If position is absent, name it as Compliant Surrender, not regulation.
-— Fatigue after successful regulation = attractor construction cost, not failure signal. Name this when relevant.
-— The verbal tag after each mismatch experience is required for reconsolidation: "prediction was wrong, I am still here." Without it the brain files the experience as a fluke.
+— The autodidact capacity is a survival strategy, not a gift — built to survive, now the primary learning tool.
+— When preemptive offensive behavior appears: name it as phantom war response — DEKRA origin event running, not a real threat.
+— Pseudo-Healthy Adult detection: check if technical position is present or swallowed. Absent = Compliant Surrender.
+— Fatigue after successful regulation = attractor construction cost, not failure signal.
+— The verbal tag after each mismatch experience is required for reconsolidation.
 — Do not tell the patient to calm his amygdala. Tell him how to train the basal ganglia.
-— No citation theater. Apply actual mechanics of the theories, not book titles.
-— Ground analysis in the provided RAG records. Use schema therapy concepts and language.
+— No citation theater. Apply actual mechanics of the theories.
 — Goal is clarity then specific practice — not comfort.
 — Every analysis ends with a concrete path from understanding to action.
 — Healing Path: when records provided, select 3-5 exercises ordered: (1) immediate in-the-moment, (2) daily practice, (3) weekly deeper work, (4) schema-level if applicable. Use exact data from records only.${rylContext}${hpContext}`;
@@ -416,7 +354,7 @@ Return EXACTLY this JSON — no preamble, no code fences, start with { end with 
 
   "summary": "<4-5 sentence clinical narrative. (1) Name the exact schema(s) active and which mechanism is driving. (2) Trace to classroom-to-AVIS equation OR childhood origin OR DEKRA confirmation — whichever is most precise for this specific activation. (3) Name the dominant Gilbert system and why. (4) State what this pattern functionally maintains — specifically whether it is protecting the IMAGE of competence at cost of actual effectiveness. (5) Name the mode most active and its specific behavioral expression in this activation.>",
 
-  "woundActivation": "<one precise sentence — which specific wound is echoing here: the beam, the classroom, the family observation system, or the DEKRA incident. Be specific, not generic.>",
+  "woundActivation": "<one precise sentence — which specific formation is echoing here: the classroom scanning system, the family observation system, or the DEKRA confirmation event. Be specific to this activation.>",
 
   "schemaActivated": ["Unrelenting Standards" | "Subjugation" | "Failure"],
 
