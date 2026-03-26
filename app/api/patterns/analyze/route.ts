@@ -148,39 +148,39 @@ This is about EXPOSURE — being SEEN AS incompetent — not actual incompetence
 ══════════════════════════════════════════════════════
 CHILDHOOD ORIGIN — PURE OBSERVATIONAL-COGNITIVE FORMATION
 ══════════════════════════════════════════════════════
-CRITICAL CORRECTION — DO NOT REFERENCE ABUSE OR TRAUMA:
-The beam and cable were normal Moroccan parenting discipline — boundaries between study and going outside to play. The patient references the beam with his mother and wife today and they laugh about it. No deep wound. No lasting physical or emotional damage. No trauma trigger. The physical restraint left no mark.
+CRITICAL — READ BEFORE ANY ANALYSIS:
+This is NOT an abuse-based origin. There is no childhood trauma. There are no wounds. Do not frame childhood as traumatic. Do not reference the beam or cable as clinical material. Do not recommend trauma therapy. The formation was entirely cognitive and observational.
 
-THIS IS NOT AN ABUSE-BASED ORIGIN. DO NOT frame childhood as traumatic, abusive, or as a source of deep wounds requiring trauma therapy. The formation was entirely cognitive and observational.
+ABOUT THE BEAM: It is a living family joke. The patient tells the story in front of his mother and his wife and everyone laughs. His mother calls him a trouble kid. When he yells at his own child today, his mother defends the grandchild and says he was exactly the same. The beam was a mother with limited parenting tools and a dynamic trouble kid who wanted to go outside instead of studying. Normal Moroccan household. No wound. No trigger. No clinical relevance.
 
-THE ACTUAL MECHANISM — INTELLIGENT CHILD READING A SYSTEM:
-Family of 5 sisters + him + younger brother. Oldest sister excelled academically → loved, gathered, valued. Sisters who failed → marginalized, pushed to the edges of family warmth. No one stated the rule. No one told him to be first in class. He WATCHED the system operating and made his own strategic conclusion: competence = belonging = safety. He decided himself to be first — because he could read the family weather accurately and concluded this was the only reliable asset and the only path to a better life.
+THE ACTUAL FORMATION — AN INTELLIGENT CHILD READING A SYSTEM:
+Family of 5 sisters + him + younger brother. Oldest sister excelled academically → loved, gathered, valued. Sisters who failed → marginalized, pushed to the edges of family warmth. No one stated the rule. No one told him to be first in class. He WATCHED the system operating and made his own strategic conclusion: competence = belonging = safety. He decided himself to be first — because he read the family weather system accurately and concluded this was the only reliable asset and the only path to a better life.
 
-This is why the schema is ego-syntonic — it feels like his own rational conclusion, not an imposed belief. It IS his own rational conclusion. He was right about the family system. Evidence alone cannot dismantle it because he derived it correctly from observation.
+This is why the schema is ego-syntonic — it IS his own rational conclusion. He was right about the family system. Evidence alone cannot dismantle it because he derived it correctly from observation.
 
-THE SCANNING SYSTEM — BUILT BY INTELLIGENCE, NOT FEAR:
-As a child he scanned constantly — when his mother was upset, when his father arrived from work, what the political news meant for household mood, how the sister who failed school was being treated, what the family tension level was. Nobody taught him this. Nobody told him this method was necessary. He built it himself as an intelligent child navigating an unpredictable household environment.
+THE SCANNING SYSTEM — BUILT BY INTELLIGENCE:
+As a child he scanned constantly — when his mother was upset, when his father arrived from travel or work, what the political news meant for household mood, how the sister who failed school was being treated, what the family tension level was. Nobody taught him this. He built it himself. An intelligent child who could read the undertext of the family system and navigate it.
 
-What nobody told him — and what went unexamined until age 34 — was that scanning, predicting, ruminating, tolerating no uncertainty, subjugating in front of the storm, avoiding his mother when angry — all of this was a method that worked short-term but would compile into a program that ran automatically for the next 20 years in every professional environment.
+What nobody ever told him — and what went unexamined for 20 years — was that scanning, predicting, ruminating, tolerating no uncertainty, subjugating in front of the storm, avoiding his mother when angry — all of this was a survival method that worked short-term but would compile into an automatic program running in every professional environment for the rest of his life.
 
-FATHER: ONCF policeman. Applied threat-detection professionally to family life. Fear narratives — no money, danger, something bad will happen. Patient absorbed this catastrophizing system but was never fully convinced — could always feel it was his father's filter, not reality. DEKRA appeared to confirm it and made it run automatically.
+FATHER: ONCF policeman. Applied professional threat-detection to family life. Fear narratives — no money, danger, something bad will happen. Never hit the patient. When father was present, mother did not use physical discipline either — bad cop / good cop dynamic. Patient absorbed father's catastrophizing system but was never fully convinced — could always feel it was his father's filter, not reality. DEKRA appeared to confirm it and made it run automatically.
 
-MOTHER: Deeply social by nature. Love conditional on money — when you gave money she showed warmth, otherwise cold. Patient's actual nature is closer to the mother — social, wanting connection, dynamic. The catastrophizing is borrowed from the father. Not native.
+MOTHER: Deeply social by nature. Limited parenting tools — the beam and discipline were her way of managing a dynamic trouble kid with limited means. Love conditional on money — when you gave money she showed warmth, otherwise cold. Patient's actual nature is closer to the mother — social, wanting connection, dynamic. The catastrophizing is borrowed from the father. Not native.
 
 THE CHILD'S ACTUAL STRENGTH:
-This was an intelligent, dynamic, self-directed child. He studied by himself, succeeded by himself, chose excellence by himself — not because anyone pressured him but because he read the system and decided. The autodidact capacity he developed — learning everything alone — was not a gift. It was a survival strategy built because admitting he didn't understand something would have cost him the only identity that kept him safe. But the capacity itself is real and remains his primary learning tool.
+An intelligent, dynamic, self-directed child who studied by himself, succeeded by himself, and chose excellence by himself — not because anyone pressured him but because he read the system and decided. No one bought him a PlayStation. No PlayStation, no travel, no spending — only when he grew up. He accepted this equation. The autodidact capacity he developed — learning everything alone — is a survival strategy that became his primary tool and remains so today.
 
 THE COMPILED CODE — CHILD TO DEKRA TO AVIS:
-The scanning system the child built → became the DEKRA engineer scanning every departmental threat for 7 years → became the Super Auto manager who erupted when the scanning stopped working → is now the AVIS manager learning to run a different program in the same body.
+The scanning system the child built → became the DEKRA engineer scanning every departmental threat for 7 years → became the Super Auto manager who erupted when the scanning stopped working → is now the AVIS manager building the third state.
 
-Same compiled code. Running in a different environment. The task is not to understand the code — the task is to replace it through behavioral repetition at AVIS until the basal ganglia builds a competing program.
+Same compiled code. Different environment each time. The task is not to understand the code — the task is to replace it through behavioral repetition at AVIS until the basal ganglia builds a competing program.
 
-AGE 34 — AWAKENING MOMENT:
-Super Auto. A training on personal development and management. First time he heard the word "amygdala." No one had ever told him about this organ. No one had ever told him about fight-or-flight, emotional intelligence, the nervous system. He went home that evening and downloaded Emotional Intelligence by Daniel Goleman. Read it. Found neuroscience. Didn't understand everything — and that activated the autodidact capacity he had built since childhood. That thread — Goleman → neuroscience → self-directed learning → clinical depth → these sessions — is a straight line from the same intelligent child who taught himself everything alone.
+AGE 34 — THE AWAKENING:
+Super Auto. A training on personal development and management. A trainer mentioned the word "amygdala." First time he had ever heard it. No one had ever told him about this organ, about fight-or-flight, about emotional intelligence. He went home that same day and printed Emotional Intelligence by Daniel Goleman. Read it. Found neuroscience terms he didn't understand yet. That gap — between what he found and what he didn't understand — activated the same autodidact engine the child had built to master everything alone. That thread — one word from a trainer → Goleman → neuroscience → self-directed clinical study → these sessions with Claude — is a straight unbroken line from the same intelligent child who taught himself everything.
 
 AGE 26 EXIT: Packed clothes by impulse, left family home. Went to live in security guard's room at workplace — escaping one constraint directly into another. The Rebel asserting autonomy with nowhere safe to go yet.
 
-INHERITED SYSTEM: Father's system = catastrophizing, worst-case prediction, isolation as safety — absorbed but never fully believed. Mother's system = deep social warmth, desire for connection. Patient's intelligence is closer to the mother. The catastrophizing is borrowed, not native.
+INHERITED SYSTEM: Father's system = catastrophizing, worst-case prediction, isolation as safety — absorbed but never fully believed. Mother's system = deep social warmth, desire for connection. Patient's actual nature is closer to the mother. The catastrophizing is borrowed from the father, not native.
 
 ══════════════════════════════════════════════════════
 SCHEMA ARCHITECTURE — CORRECTED FINAL VERSION
