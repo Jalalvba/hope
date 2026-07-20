@@ -2,15 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { stripJsonFences } from "@/lib/validatePatternAnalysis";
 
 type Mode = "describe" | "manual";
 type Stage = "input" | "processing";
+type DescribePhase = "compose" | "generating" | "prompt" | "saving";
 
 interface FieldOptions {
   cognitiveLabels: string[];
   symptoms: string[];
   coreBeliefs: string[];
-  notes: string[];
 }
 
 // Multi-select dropdown component
@@ -112,6 +113,10 @@ export function NewPatternButton() {
 
   // Describe mode
   const [description, setDescription] = useState("");
+  const [describePhase, setDescribePhase] = useState<DescribePhase>("compose");
+  const [prompt, setPrompt] = useState("");
+  const [pasted, setPasted] = useState("");
+  const [copied, setCopied] = useState(false);
 
   // Manual mode
   const [manual, setManual] = useState({
@@ -125,6 +130,9 @@ export function NewPatternButton() {
     setStage("input");
     setError("");
     setDescription("");
+    setDescribePhase("compose");
+    setPrompt("");
+    setPasted("");
     setManual({ label: "", short: "", coreBelief: "", symptoms: [], cognitiveLabels: [], note: "" });
     setOpen(true);
     // Pre-fetch field options
@@ -135,9 +143,9 @@ export function NewPatternButton() {
     } catch { /* options stay null */ }
   };
 
-  const submitDescribe = async () => {
+  const generatePrompt = async () => {
     if (!description.trim()) return;
-    setStage("processing");
+    setDescribePhase("generating");
     setError("");
     try {
       const res = await fetch("/api/patterns/create-from-description", {
@@ -147,11 +155,43 @@ export function NewPatternButton() {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? JSON.stringify(json));
+      setPrompt(json.data.prompt);
+      setDescribePhase("prompt");
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed");
+      setDescribePhase("compose");
+    }
+  };
+
+  const copyPrompt = async () => {
+    await navigator.clipboard.writeText(prompt);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+
+  const savePasted = async () => {
+    setError("");
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(stripJsonFences(pasted));
+    } catch {
+      setError("That doesn't look like valid JSON. Paste the exact response from Claude/Gemini's chat UI.");
+      return;
+    }
+    setDescribePhase("saving");
+    try {
+      const res = await fetch("/api/patterns/create-from-paste", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(parsed),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? JSON.stringify(json));
       setOpen(false);
       router.push(`/patterns/${json.data.id}`);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed");
-      setStage("input");
+      setDescribePhase("prompt");
     }
   };
 
@@ -182,6 +222,8 @@ export function NewPatternButton() {
     }
   };
 
+  const busy = stage === "processing" || describePhase === "generating" || describePhase === "saving";
+
   return (
     <>
       <button onClick={openModal}
@@ -192,13 +234,13 @@ export function NewPatternButton() {
       {open && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
           <div className="absolute inset-0 bg-ink-950/85 backdrop-blur-sm"
-            onClick={() => { if (stage !== "processing") setOpen(false); }} />
+            onClick={() => { if (!busy) setOpen(false); }} />
           <div className="relative glass rounded-t-2xl sm:rounded-xl w-full sm:max-w-lg p-6 space-y-4 max-h-[92vh] overflow-y-auto">
 
             {/* Header */}
             <div className="flex items-center justify-between">
               <h2 className="font-display text-lg text-parchment-100">New pattern</h2>
-              {stage !== "processing" && (
+              {!busy && (
                 <button onClick={() => setOpen(false)}
                   className="text-parchment-300/30 hover:text-parchment-300/60 text-2xl leading-none">×</button>
               )}
@@ -207,7 +249,7 @@ export function NewPatternButton() {
             {/* Mode toggle */}
             <div className="flex rounded-lg overflow-hidden border border-parchment-300/10">
               {(["describe", "manual"] as Mode[]).map((m) => (
-                <button key={m} onClick={() => setMode(m)} disabled={stage === "processing"}
+                <button key={m} onClick={() => setMode(m)} disabled={busy}
                   className={`flex-1 py-2 text-xs font-medium transition-colors ${mode === m ? "bg-gold-400/12 text-gold-400" : "text-parchment-300/35 hover:text-parchment-300/60"}`}>
                   {m === "describe" ? "✦ Describe situation" : "Manual fields"}
                 </button>
@@ -215,22 +257,60 @@ export function NewPatternButton() {
             </div>
 
             {/* DESCRIBE MODE */}
-            {mode === "describe" && (
+            {mode === "describe" && describePhase === "compose" && (
               <>
                 <p className="text-xs text-parchment-300/40 leading-relaxed">
-                  Describe what happened. Claude extracts the pattern, fills all fields, and analyzes it.
+                  Describe what happened. This assembles a prompt that extracts the pattern fields and
+                  analyzes it — copy it into Claude or Gemini&apos;s chat UI, then paste the JSON result back.
                 </p>
                 <div className="glass-subtle rounded-lg px-3 py-2.5 field-ring">
                   <textarea rows={6}
                     placeholder="e.g. My boss sent a one-line email saying 'we need to talk tomorrow'. I immediately started rehearsing defenses, couldn't sleep, ran through every possible mistake..."
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) submitDescribe(); }}
-                    disabled={stage === "processing"}
+                    onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) generatePrompt(); }}
                     autoFocus
-                    className="w-full text-sm text-parchment-100 placeholder-parchment-300/20 leading-relaxed disabled:opacity-50" />
+                    className="w-full text-sm text-parchment-100 placeholder-parchment-300/20 leading-relaxed" />
                 </div>
-                <p className="text-[10px] text-parchment-300/20 italic">⌘ + Enter to submit</p>
+                <p className="text-[10px] text-parchment-300/20 italic">⌘ + Enter to generate prompt</p>
+              </>
+            )}
+
+            {mode === "describe" && describePhase === "generating" && (
+              <div className="flex items-center gap-3 py-4">
+                <span className="w-4 h-4 rounded-full border border-gold-400/30 border-t-gold-400 animate-spin" />
+                <span className="text-sm text-gold-400/60">Assembling prompt…</span>
+              </div>
+            )}
+
+            {mode === "describe" && (describePhase === "prompt" || describePhase === "saving") && (
+              <>
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] text-parchment-300/40 uppercase tracking-widest">
+                      1. Copy this prompt into Claude or Gemini&apos;s chat UI
+                    </p>
+                    <button onClick={copyPrompt}
+                      className="text-[10px] text-gold-400/60 hover:text-gold-400 transition-colors">
+                      {copied ? "Copied ✓" : "Copy"}
+                    </button>
+                  </div>
+                  <textarea readOnly value={prompt} rows={6}
+                    className="w-full text-[11px] font-mono text-parchment-200/60 bg-ink-950/40 rounded-lg p-3 leading-relaxed resize-y" />
+                </div>
+
+                <div className="space-y-1.5">
+                  <p className="text-[10px] text-parchment-300/40 uppercase tracking-widest">
+                    2. Paste the JSON response back here
+                  </p>
+                  <textarea
+                    value={pasted}
+                    onChange={(e) => setPasted(e.target.value)}
+                    placeholder="{ &quot;pattern&quot;: { ... }, &quot;analysis&quot;: { ... } }"
+                    rows={6}
+                    disabled={describePhase === "saving"}
+                    className="w-full text-[11px] font-mono text-parchment-100 bg-ink-950/40 rounded-lg p-3 leading-relaxed resize-y placeholder-parchment-300/20 disabled:opacity-50" />
+                </div>
               </>
             )}
 
@@ -281,13 +361,15 @@ export function NewPatternButton() {
                   placeholder="Select cognitive distortions..."
                 />
 
-                <SingleSelect
-                  label="Note (optional)"
-                  options={options?.notes ?? []}
-                  value={manual.note}
-                  onChange={(v) => setManual((p) => ({ ...p, note: v }))}
-                  placeholder="e.g. Variant of P3..."
-                />
+                <div className="space-y-1">
+                  <label className="text-[10px] text-parchment-300/40 uppercase tracking-widest">Note (optional)</label>
+                  <div className="glass-subtle rounded-lg px-3 py-2.5 field-ring">
+                    <input type="text" placeholder="e.g. Variant of P3..."
+                      value={manual.note}
+                      onChange={(e) => setManual((p) => ({ ...p, note: e.target.value }))}
+                      className="w-full text-sm text-parchment-100 placeholder-parchment-300/20" />
+                  </div>
+                </div>
               </>
             )}
 
@@ -295,19 +377,24 @@ export function NewPatternButton() {
               <p className="text-xs text-rust-400 bg-rust-400/8 px-3 py-2 rounded-lg break-all">{error}</p>
             )}
 
-            {stage === "processing" ? (
+            {mode === "describe" && (describePhase === "prompt" || describePhase === "saving") ? (
+              <button
+                onClick={savePasted}
+                disabled={!pasted.trim() || describePhase === "saving"}
+                className="w-full py-3 rounded-xl text-sm font-medium border border-gold-400/25 text-gold-400 bg-gold-400/10 hover:bg-gold-400/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                {describePhase === "saving" ? "Saving…" : "Validate & save"}
+              </button>
+            ) : mode === "describe" && describePhase === "generating" ? null : mode === "manual" && stage === "processing" ? (
               <div className="w-full py-3 rounded-xl border border-gold-400/15 bg-gold-400/5 flex items-center justify-center gap-3">
                 <span className="w-3.5 h-3.5 rounded-full border border-gold-400/30 border-t-gold-400 animate-spin" />
-                <span className="text-sm text-gold-400/60">
-                  {mode === "describe" ? "Claude is reading and structuring…" : "Saving…"}
-                </span>
+                <span className="text-sm text-gold-400/60">Saving…</span>
               </div>
             ) : (
               <button
-                onClick={mode === "describe" ? submitDescribe : submitManual}
+                onClick={mode === "describe" ? generatePrompt : submitManual}
                 disabled={mode === "describe" ? !description.trim() : !manual.label.trim() || !manual.coreBelief.trim()}
                 className="w-full py-3 rounded-xl text-sm font-medium border border-gold-400/25 text-gold-400 bg-gold-400/10 hover:bg-gold-400/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
-                {mode === "describe" ? "Analyze & save pattern" : "Save pattern"}
+                {mode === "describe" ? "Generate prompt" : "Save pattern"}
               </button>
             )}
           </div>

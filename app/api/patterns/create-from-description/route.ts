@@ -1,14 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import clientPromise from "@/lib/mongo";
-import Anthropic from "@anthropic-ai/sdk";
-import type { Pattern, PatternAnalysis } from "@/types";
-
-const DB = "hope";
-const ai = new Anthropic();
 
 const SYSTEM = `You are a clinical psychologist specialized in schema therapy (Young), metacognitive therapy (Wells), ACT (Ong & Twohig), CBT (Burns), confidence-based CBT (Sokol & Fox), and compassion-focused therapy (Gilbert).
 
-The user will describe a real situation they experienced. Your job is TWO things in ONE call:
+The user will describe a real situation they experienced. Your job is TWO things in ONE response:
 1. Extract a structured psychological pattern from their description
 2. Analyze that pattern against their clinical profile
 
@@ -26,28 +20,8 @@ KEY EQUATION: Student who couldn't say "I don't understand" = Manager who can't 
 
 Respond ONLY with a single valid JSON object. No preamble. No explanation. No markdown. No code fences. Start your response with { and end with }.`;
 
-export async function POST(req: NextRequest) {
-  let rawText = "";
-  try {
-    const { description } = await req.json();
-    if (!description?.trim()) {
-      return NextResponse.json({ error: "Description required" }, { status: 400 });
-    }
-
-    const mongo = await clientPromise;
-    const db = mongo.db(DB);
-
-    const patterns = await db.collection<Pattern>("psy")
-      .find({ type: "pattern" })
-      .project({ id: 1 })
-      .toArray();
-    const nums = patterns
-      .map((p) => parseInt(String(p.id).replace("P", "")))
-      .filter((n) => !isNaN(n));
-    const nextNum = nums.length > 0 ? Math.max(...nums) + 1 : 12;
-    const nextId = `P${nextNum}`;
-
-    const prompt = `The user describes this situation:
+function buildPrompt(description: string): string {
+  const task = `The user describes this situation:
 
 "${description}"
 
@@ -68,59 +42,28 @@ Return a single JSON object with exactly this structure:
     "responseMode": "<Surrender or Escape or Counterattack>",
     "systemsInvolved": ["<threat or drive or soothing>"],
     "relatedPatterns": ["<P1 or P3 etc>"],
-    "bookMappings": [{"concept": "<n>", "source": "<book>", "relevance": "<one sentence>"}],
+    "bookMappings": [{"concept": "<name>", "source": "<book>", "relevance": "<one sentence>"}],
     "practiceRecommendation": "<one specific concrete practice>"
   }
 }`;
 
-    const response = await ai.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 2000,
-      system: SYSTEM,
-      messages: [{ role: "user", content: prompt }],
-    });
+  return `${SYSTEM}\n\n${task}`;
+}
 
-    rawText = response.content
-      .filter((b) => b.type === "text")
-      .map((b) => b.text)
-      .join("");
+// Assembles the extract+analyze prompt as plain text for the user to paste
+// into Claude or Gemini's chat UI themselves. Does not call any AI API. The
+// JSON result is pasted back and saved via POST /api/patterns/create-from-paste.
+export async function POST(req: NextRequest) {
+  try {
+    const { description } = await req.json();
+    if (!description?.trim()) {
+      return NextResponse.json({ error: "Description required" }, { status: 400 });
+    }
 
-    const cleaned = rawText
-      .replace(/^```json\s*/i, "")
-      .replace(/^```\s*/i, "")
-      .replace(/\s*```$/i, "")
-      .trim();
+    const prompt = buildPrompt(description.trim());
 
-    const parsed = JSON.parse(cleaned);
-    const { pattern: patternFields, analysis } = parsed;
-    analysis.analyzedAt = new Date(analysis.analyzedAt);
-
-    const doc: Pattern & { analysis: PatternAnalysis; createdAt: Date; updatedAt: Date } = {
-      id: nextId,
-      type: "pattern",
-      label: patternFields.label,
-      short: patternFields.short,
-      coreBelief: patternFields.coreBelief,
-      symptoms: patternFields.symptoms ?? [],
-      cognitiveLabels: patternFields.cognitiveLabels ?? [],
-      note: patternFields.note ?? "",
-      analysis,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    const { _id: _omit, ...docToInsert } = doc;
-    const result = await db.collection("psy").insertOne(docToInsert);
-
-    return NextResponse.json({
-      data: { ...doc, _id: String(result.insertedId) },
-    }, { status: 201 });
-
+    return NextResponse.json({ data: { prompt } });
   } catch (err) {
-    return NextResponse.json({
-      error: String(err),
-      rawClaudeResponse: rawText,
-      parseIssue: rawText ? `First 500 chars: ${rawText.substring(0, 500)}` : "Claude returned empty response",
-    }, { status: 500 });
+    return NextResponse.json({ error: String(err) }, { status: 500 });
   }
 }

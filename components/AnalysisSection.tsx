@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import type { PatternAnalysis, HealingStep } from "@/types";
+import { stripJsonFences } from "@/lib/validatePatternAnalysis";
 
 const SCHEMA_CLS: Record<string, string> = {
-  Defectiveness: "text-rust-400",
   Failure: "text-gold-400",
   "Unrelenting Standards": "text-mist-400",
   Subjugation: "text-amber-400",
@@ -27,20 +27,10 @@ function fmtDate(d: Date | string) {
 
 const FRAMEWORK_COLORS: Record<string, string> = {
   schema_therapy: "text-amber-400/70 bg-amber-400/8 border-amber-400/15",
-  mct: "text-gold-400/70 bg-gold-400/8 border-gold-400/15",
-  act: "text-teal-400/70 bg-teal-400/8 border-teal-400/15",
-  cbt: "text-blue-400/70 bg-blue-400/8 border-blue-400/15",
-  cft: "text-rose-400/70 bg-rose-400/8 border-rose-400/15",
-  integrated: "text-violet-400/70 bg-violet-400/8 border-violet-400/15",
 };
 
 const FRAMEWORK_LABELS: Record<string, string> = {
   schema_therapy: "Schema",
-  mct: "MCT",
-  act: "ACT",
-  cbt: "CBT",
-  cft: "CFT",
-  integrated: "Integrated",
 };
 
 const STEP_ICONS = ["⓵", "⓶", "⓷", "⓸", "⓹"];
@@ -137,6 +127,141 @@ function Label({ children }: { children: React.ReactNode }) {
   );
 }
 
+function PromptFlow({
+  patternId,
+  onSaved,
+  onCancel,
+}: {
+  patternId: string;
+  onSaved: (a: PatternAnalysis) => void;
+  onCancel: () => void;
+}) {
+  const [stage, setStage] = useState<"generating" | "ready" | "saving">("generating");
+  const [prompt, setPrompt] = useState("");
+  const [pasted, setPasted] = useState("");
+  const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/api/patterns/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ patternId }),
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error);
+        setPrompt(json.data.prompt);
+        setStage("ready");
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : "Failed to generate prompt");
+        setStage("ready");
+      }
+    })();
+  }, [patternId]);
+
+  const copyPrompt = async () => {
+    await navigator.clipboard.writeText(prompt);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+
+  const save = async () => {
+    setError("");
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(stripJsonFences(pasted));
+    } catch {
+      setError("That doesn't look like valid JSON. Paste the exact response from Claude/Gemini's chat UI.");
+      return;
+    }
+    setStage("saving");
+    try {
+      const res = await fetch(`/api/patterns/${patternId}/analysis`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ analysis: parsed }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error);
+      onSaved(json.data.analysis);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to save analysis");
+      setStage("ready");
+    }
+  };
+
+  return (
+    <div className="glass rounded-xl p-5 space-y-4 border-l-2 border-gold-400/25">
+      <div className="flex items-center justify-between">
+        <span className="text-[10px] text-gold-400/70 uppercase tracking-widest font-medium">
+          Manual analysis
+        </span>
+        <button onClick={onCancel} className="text-parchment-300/30 hover:text-parchment-300/60 text-sm leading-none">
+          Cancel
+        </button>
+      </div>
+
+      {stage === "generating" ? (
+        <div className="flex items-center gap-3 py-4">
+          <div className="w-4 h-4 rounded-full border border-gold-400/30 border-t-gold-400 animate-spin" />
+          <p className="text-xs text-parchment-300/40">Assembling prompt…</p>
+        </div>
+      ) : (
+        <>
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] text-parchment-300/40 uppercase tracking-widest">
+                1. Copy this prompt into Claude or Gemini&apos;s chat UI
+              </p>
+              <button
+                onClick={copyPrompt}
+                disabled={!prompt}
+                className="text-[10px] text-gold-400/60 hover:text-gold-400 transition-colors disabled:opacity-30"
+              >
+                {copied ? "Copied ✓" : "Copy"}
+              </button>
+            </div>
+            <textarea
+              readOnly
+              value={prompt}
+              rows={6}
+              className="w-full text-[11px] font-mono text-parchment-200/60 bg-ink-950/40 rounded-lg p-3 leading-relaxed resize-y"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <p className="text-[10px] text-parchment-300/40 uppercase tracking-widest">
+              2. Paste the JSON response back here
+            </p>
+            <textarea
+              value={pasted}
+              onChange={(e) => setPasted(e.target.value)}
+              placeholder="{ ...pasted JSON... }"
+              rows={6}
+              disabled={stage === "saving"}
+              className="w-full text-[11px] font-mono text-parchment-100 bg-ink-950/40 rounded-lg p-3 leading-relaxed resize-y placeholder-parchment-300/20 disabled:opacity-50"
+            />
+          </div>
+
+          {error && (
+            <p className="text-xs text-rust-400 bg-rust-400/8 px-3 py-2 rounded-lg break-all">{error}</p>
+          )}
+
+          <button
+            onClick={save}
+            disabled={!pasted.trim() || stage === "saving"}
+            className="w-full py-2.5 rounded-lg text-sm font-medium border border-gold-400/25 text-gold-400 bg-gold-400/10 hover:bg-gold-400/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            {stage === "saving" ? "Saving…" : "Validate & save"}
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
+
 export function AnalysisSection({
   patternId,
   existingAnalysis,
@@ -145,58 +270,33 @@ export function AnalysisSection({
   existingAnalysis: PatternAnalysis | null;
 }) {
   const [analysis, setAnalysis] = useState<PatternAnalysis | null>(existingAnalysis);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [showPromptFlow, setShowPromptFlow] = useState(false);
 
-  useEffect(() => {
-    if (!analysis) runAnalysis();
-  }, []);
+  if (showPromptFlow) {
+    return (
+      <PromptFlow
+        patternId={patternId}
+        onCancel={() => setShowPromptFlow(false)}
+        onSaved={(a) => {
+          setAnalysis(a);
+          setShowPromptFlow(false);
+        }}
+      />
+    );
+  }
 
-  const runAnalysis = async (useOpus = false) => {
-    setLoading(true);
-    setError("");
-    try {
-      const res = await fetch("/api/patterns/analyze", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(useOpus ? { "x-model": "opus" } : {}),
-        },
-        body: JSON.stringify({ patternId }),
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error);
-      const a = json.data?.analysis ?? json.data;
-      setAnalysis(a);
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Analysis failed");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading)
+  if (!analysis)
     return (
       <div className="glass rounded-xl p-8 flex flex-col items-center gap-3">
-        <div className="w-5 h-5 rounded-full border border-gold-400/30 border-t-gold-400 animate-spin" />
-        <p className="text-xs text-parchment-300/40">Analyzing with Claude…</p>
-      </div>
-    );
-
-  if (error)
-    return (
-      <div className="glass rounded-xl p-5 space-y-3">
-        <p className="text-xs text-rust-400">{error}</p>
+        <p className="text-xs text-parchment-300/40">No analysis yet.</p>
         <button
-          onClick={() => runAnalysis(false)}
-          className="text-xs text-gold-400/60 hover:text-gold-400 transition-colors"
+          onClick={() => setShowPromptFlow(true)}
+          className="text-xs text-gold-400/70 hover:text-gold-400 transition-colors border border-gold-400/25 rounded-lg px-4 py-2"
         >
-          Try again
+          Generate analysis prompt
         </button>
       </div>
     );
-
-  if (!analysis) return null;
 
   const schemaActivated = Array.isArray(analysis.schemaActivated) ? analysis.schemaActivated : [];
   const systemsInvolved = Array.isArray(analysis.systemsInvolved) ? analysis.systemsInvolved : [];
@@ -222,21 +322,12 @@ export function AnalysisSection({
               {fmtDate(analysis.analyzedAt)}
             </span>
           )}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => runAnalysis(false)}
-              className="text-[10px] text-parchment-300/25 hover:text-gold-400/50 transition-colors"
-            >
-              sonnet
-            </button>
-            <span className="text-parchment-300/10">·</span>
-            <button
-              onClick={() => runAnalysis(true)}
-              className="text-[10px] text-parchment-300/20 hover:text-amber-400/70 transition-colors"
-            >
-              opus ✦
-            </button>
-          </div>
+          <button
+            onClick={() => setShowPromptFlow(true)}
+            className="text-[10px] text-parchment-300/25 hover:text-gold-400/50 transition-colors"
+          >
+            Regenerate
+          </button>
         </div>
       </div>
 

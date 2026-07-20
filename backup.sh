@@ -6,8 +6,6 @@ tar -czf ~/Downloads/hope-backup-$(date +%Y%m%d).tar.gz \
   --exclude='node_modules' \
   --exclude='.next' \
   --exclude='*.tar.gz' \
-  --exclude='hope@0.1.0' \
-  --exclude='next' \
   --exclude='.git' \
   --exclude='ryl_database.json' \
   --exclude='mct_database.json' \

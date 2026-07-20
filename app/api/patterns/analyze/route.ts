@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import clientPromise from "@/lib/mongo";
-import Anthropic from "@anthropic-ai/sdk";
 import type { Pattern } from "@/types";
 
 const DB = "hope";
-const ai = new Anthropic();
 
 // ─── Utilities ───────────────────────────────────────────────────────────────
 
@@ -417,6 +415,10 @@ HEALING PATH: Select 3-5 exercises ordered (1) immediate in-the-moment technique
 }
 
 // ─── Route handler ────────────────────────────────────────────────────────────
+// Assembles the full analysis prompt (system prompt + RAG context + pattern
+// data) as plain text for the user to paste into Claude or Gemini's chat UI
+// themselves. Does not call any AI API. The result is pasted back and saved
+// via PUT /api/patterns/[id]/analysis.
 
 export async function POST(req: NextRequest) {
   try {
@@ -450,39 +452,11 @@ export async function POST(req: NextRequest) {
       : "";
 
     const SYSTEM = buildSystemPrompt(rylContext, hpContext);
-    const prompt  = buildUserPrompt(pattern);
+    const userPrompt = buildUserPrompt(pattern);
 
-    const useOpus = req.headers.get("x-model") === "opus";
-    const model   = useOpus ? "claude-opus-4-5" : "claude-sonnet-4-20250514";
+    const prompt = `${SYSTEM}\n\n${userPrompt}`;
 
-    const response = await ai.messages.create({
-      model,
-      max_tokens: 4096,
-      system: SYSTEM,
-      messages: [{ role: "user", content: prompt }],
-    });
-
-    const raw = response.content
-      .filter((b) => b.type === "text")
-      .map((b) => b.text)
-      .join("");
-
-    const cleaned = raw
-      .replace(/^```json\s*/i, "")
-      .replace(/^```\s*/i, "")
-      .replace(/\s*```$/i, "")
-      .trim();
-
-    const analysis = JSON.parse(cleaned);
-    analysis.analyzedAt = new Date(analysis.analyzedAt ?? Date.now());
-
-    await db.collection<Pattern>("psy").updateOne(
-      buildQuery(patternId),
-      { $set: { analysis, updatedAt: new Date() } }
-    );
-
-    const updated = await db.collection<Pattern>("psy").findOne(buildQuery(patternId));
-    return NextResponse.json({ data: { ...updated, _id: String(updated!._id) } });
+    return NextResponse.json({ data: { prompt } });
 
   } catch (err) {
     console.error("[analyze]", err);
