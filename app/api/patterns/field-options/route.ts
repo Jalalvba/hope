@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import clientPromise from "@/lib/mongo";
+import clientPromise, { dbName } from "@/lib/mongo";
 
 export async function GET() {
   try {
     const client = await clientPromise;
-    const doc = await client.db("hope").collection("fields")
+    const doc = await client.db(dbName).collection("fields")
       .findOne({ _id: "clinical_fields_v1" } as any);
 
     if (!doc) {

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
-import clientPromise from "@/lib/mongo";
+import clientPromise, { dbName } from "@/lib/mongo";
 import type { Pattern } from "@/types";
 
-const DB = "hope";
+const DB = dbName;
 const COL = "psy";
 
 function buildQuery(id: string) {

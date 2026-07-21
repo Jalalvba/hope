@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import clientPromise from "@/lib/mongo";
+import clientPromise, { dbName } from "@/lib/mongo";
 import type { Pattern } from "@/types";
 
-const DB = "hope";
+const DB = dbName;
 
 export async function GET() {
   try {

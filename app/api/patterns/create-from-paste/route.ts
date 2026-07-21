@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import clientPromise from "@/lib/mongo";
+import clientPromise, { dbName } from "@/lib/mongo";
 import type { Pattern, PatternAnalysis } from "@/types";
 import { validateNewPatternFields, validatePatternAnalysis } from "@/lib/validatePatternAnalysis";
 
-const DB = "hope";
+const DB = dbName;
 
 // Saves a {pattern, analysis} JSON object pasted back from Claude/Gemini's
 // chat UI after running the create-from-description prompt.

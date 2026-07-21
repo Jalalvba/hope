@@ -5,7 +5,7 @@
  * Every record drawn from the 18-book schema therapy library.
  * Focused on Unrelenting Standards, Subjugation (Rebel), Failure.
  *
- * Run: export $(grep MONGODB_URI .env.local | xargs) && pnpm tsx scripts/seed-healing.ts
+ * Run: export $(grep -E '^(MONGODB_URI|MONGODB_DB)=' .env.local | xargs) && pnpm tsx scripts/seed-healing.ts
  */
 
 import { MongoClient } from "mongodb";
@@ -53,9 +53,11 @@ const records: HealingRecord[] = [
 async function main() {
   const uri = process.env.MONGODB_URI;
   if (!uri) throw new Error("MONGODB_URI not set");
+  const dbName = process.env.MONGODB_DB;
+  if (!dbName) throw new Error("MONGODB_DB not set");
   const client = new MongoClient(uri);
   await client.connect();
-  const db = client.db("hope");
+  const db = client.db(dbName);
   const collections = await db.listCollections({ name: "hp" }).toArray();
   if (collections.length > 0) { await db.collection("hp").drop(); console.log("Dropped existing hp collection"); }
   await db.collection("hp").insertMany(records);

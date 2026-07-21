@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import clientPromise from "@/lib/mongo";
+import clientPromise, { dbName } from "@/lib/mongo";
 import { ObjectId } from "mongodb";
 import type { Pattern } from "@/types";
 import { getPatternColor } from "@/types";
@@ -16,7 +16,7 @@ const COLOR: Record<string, { badge: string; title: string; border: string }> = 
 
 async function getPattern(id: string): Promise<Pattern | null> {
   const client = await clientPromise;
-  const doc = await client.db("hope").collection<Pattern>("psy").findOne(
+  const doc = await client.db(dbName).collection<Pattern>("psy").findOne(
     ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { id }
   );
   if (!doc) return null;

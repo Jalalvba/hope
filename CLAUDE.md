@@ -65,4 +65,4 @@ Reference patterns P1–P11 are pre-seeded and read-only in the UI. New patterns
 ## Known issues
 
 - `npm run lint` currently crashes (`eslint@10.1.0` is incompatible with the `eslint-plugin-react@7.37.5` pulled in by `eslint-config-next`) — not a code issue, a dependency version mismatch.
-- `mct_database.json` and `ryl_database.json` at the repo root are large (~1.2MB each) one-off seed dumps, committed to git history. Only `ryl` is still read at runtime, and its collection isn't seeded from this repo (no `seed-ryl` script exists — it was seeded manually or by a script that no longer exists here).
+- `mct_database.json` and `ryl_database.json` (large one-off seed dumps, unreferenced by any code) were removed from the repo. They remain recoverable from git history if ever needed again. The `ryl` collection itself is still read at runtime as RAG context in `analyze/route.ts`; it just isn't seeded from a script in this repo.

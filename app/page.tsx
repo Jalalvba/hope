@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 import Link from "next/link";
-import clientPromise from "@/lib/mongo";
+import clientPromise, { dbName } from "@/lib/mongo";
 import type { Pattern } from "@/types";
 import { getPatternColor } from "@/types";
 import { NewPatternButton } from "@/components/NewPatternButton";
@@ -14,7 +14,7 @@ const COLOR: Record<string, { badge: string; border: string; belief: string }> =
 
 async function getPatterns(): Promise<Pattern[]> {
   const client = await clientPromise;
-  return client.db("hope").collection<Pattern>("psy")
+  return client.db(dbName).collection<Pattern>("psy")
     .find({ type: "pattern" }).toArray()
     .then((docs) => docs
       .map((d) => ({ ...d, _id: String(d._id) }))
