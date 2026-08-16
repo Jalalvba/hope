@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import clientPromise, { dbName } from "@/lib/mongo";
+import { ROOT_BELIEF } from "@/lib/clinicalProfile";
 import type { Pattern } from "@/types";
 
 const DB = dbName;
@@ -142,7 +143,7 @@ First major DEKRA incident: machine breakdown, handled correctly, redirected cli
 ══════════════════════════════════════════════════════
 ROOT BELIEF
 ══════════════════════════════════════════════════════
-"I am fundamentally at risk of being seen as incompetent by someone with power over me."
+"${ROOT_BELIEF}"
 This is about EXPOSURE — being SEEN AS incompetent — not actual incompetence. The fear is the verdict. The competence is real. Do not reassure him about competence.
 
 ══════════════════════════════════════════════════════

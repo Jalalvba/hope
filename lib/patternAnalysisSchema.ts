@@ -5,7 +5,7 @@
 // model's output — it does not replace validatePatternAnalysis(), which is
 // still the gate before anything is persisted.
 
-const STRING = { type: "STRING" } as const;
+import { STRING } from "@/lib/geminiSchema";
 
 export const patternAnalysisSchema: Record<string, unknown> = {
   type: "OBJECT",

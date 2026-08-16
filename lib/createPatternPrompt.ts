@@ -4,6 +4,9 @@
 // one Gemini call. Contains the user's real clinical profile — do not
 // templatize or genericize this file.
 
+import { ROOT_BELIEF, KNOWN_PATTERNS_COMPACT } from "@/lib/clinicalProfile";
+import { STRING } from "@/lib/geminiSchema";
+
 // System instruction sent via Gemini's native `systemInstruction` field rather
 // than concatenated into the user prompt — keeps the persona/profile out of
 // the per-call token count reported as "prompt" and out of the conversational
@@ -16,7 +19,7 @@ The user will describe a real situation they experienced. Your job is TWO things
 2. Analyze that pattern against their clinical profile
 
 CLINICAL PROFILE:
-ROOT BELIEF: "I am fundamentally at risk of being seen as incompetent by someone with power over me."
+ROOT BELIEF: "${ROOT_BELIEF}"
 THREAT EQUATION: Competence = safety. Incompetence = attack.
 PRIMARY SCHEMA: Unrelenting Standards — observation-based strategic conclusion (watched sisters, concluded excellence = belonging = safety). Ego-syntonic. Engine of all other patterns.
 SECONDARY SCHEMA: Subjugation (Rebel type) — objection to being instructed at all, not to content. Dynamic child tied to beam now fights any constraint.
@@ -24,7 +27,7 @@ UNDERLYING MECHANISM: Hypervigilant anticipation as survival strategy.
 PRESENT BUT SECONDARY: Failure (Brian type) — contradicted by dream evidence.
 NOT PRESENT: Defectiveness — patient correctly rejected throughout. No shame about core self.
 GILBERT SYSTEMS: Threat chronically dominant. Drive contaminated by threat. Soothing severely underdeveloped.
-KNOWN PATTERNS: P1=Career Uncertainty, P2=Coworker Motives, P3=Boss Reaction, P4=Waiting Pain, P5=Social Validation, P6=Perfectionism, P7=Hostile Attribution, P8=Auto Social Simulation, P9=Third-Person Eval Simulation, P10=Rumination Engine, P11=Status Threat, P12=Post-Conflict Shame, P13=Reassurance Loop, P14=Interview Simulation Trap, P15=Authority Challenge Reactivity, P16=Authority Confusion Schema Response
+KNOWN PATTERNS: ${KNOWN_PATTERNS_COMPACT}
 KEY EQUATION: Student who couldn't say "I don't understand" = Manager who can't say "I need guidance."
 
 Respond ONLY with a single valid JSON object. No preamble. No explanation. No markdown. No code fences. Start your response with { and end with }.`;
@@ -32,8 +35,6 @@ Respond ONLY with a single valid JSON object. No preamble. No explanation. No ma
 export function buildCreateFromDescriptionPrompt(description: string): string {
   return `The user describes this situation:\n\n"${description}"\n\nExtract the pattern and clinical analysis. Limit bookMappings to a maximum of 2 highly relevant entries.`;
 }
-
-const STRING = { type: "STRING" } as const;
 
 export const createFromDescriptionSchema: Record<string, unknown> = {
   type: "OBJECT",
