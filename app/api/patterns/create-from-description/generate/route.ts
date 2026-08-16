@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { buildCreateFromDescriptionPrompt, createFromDescriptionSchema } from "@/lib/createPatternPrompt";
+import { buildCreateFromDescriptionPrompt, createFromDescriptionSchema, CLINICAL_CONTEXT } from "@/lib/createPatternPrompt";
 import { callGeminiWithTracking } from "@/lib/gemini-cost-tracker";
 import { validateNewPatternFields, validatePatternAnalysis } from "@/lib/validatePatternAnalysis";
 
@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
 
     const result = await callGeminiWithTracking("create-from-description", {
       prompt,
+      systemInstruction: CLINICAL_CONTEXT,
       responseSchema: createFromDescriptionSchema,
       model: typeof model === "string" && model ? model : undefined,
       temperature: 0.3,
@@ -34,6 +35,13 @@ export async function POST(req: NextRequest) {
     }
 
     const raw = result.result as { pattern?: unknown; analysis?: unknown } | null;
+
+    // The model routinely invents analyzedAt rather than reporting the real
+    // time, so stamp it server-side from the actual generation, matching the
+    // analyze/generate route's convention.
+    if (raw?.analysis && typeof raw.analysis === "object") {
+      (raw.analysis as Record<string, unknown>).analyzedAt = new Date().toISOString();
+    }
 
     const patternResult = validateNewPatternFields(raw?.pattern);
     if (!patternResult.valid) {

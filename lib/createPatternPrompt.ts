@@ -4,7 +4,12 @@
 // one Gemini call. Contains the user's real clinical profile — do not
 // templatize or genericize this file.
 
-const SYSTEM = `You are a clinical psychologist specialized in schema therapy (Young), metacognitive therapy (Wells), ACT (Ong & Twohig), CBT (Burns), confidence-based CBT (Sokol & Fox), and compassion-focused therapy (Gilbert).
+// System instruction sent via Gemini's native `systemInstruction` field rather
+// than concatenated into the user prompt — keeps the persona/profile out of
+// the per-call token count reported as "prompt" and out of the conversational
+// turn itself. Contains the user's real clinical profile — do not templatize
+// or genericize this file.
+export const CLINICAL_CONTEXT = `You are a clinical psychologist specialized in schema therapy (Young), metacognitive therapy (Wells), ACT (Ong & Twohig), CBT (Burns), confidence-based CBT (Sokol & Fox), and compassion-focused therapy (Gilbert).
 
 The user will describe a real situation they experienced. Your job is TWO things in ONE response:
 1. Extract a structured psychological pattern from their description
@@ -25,33 +30,7 @@ KEY EQUATION: Student who couldn't say "I don't understand" = Manager who can't 
 Respond ONLY with a single valid JSON object. No preamble. No explanation. No markdown. No code fences. Start your response with { and end with }.`;
 
 export function buildCreateFromDescriptionPrompt(description: string): string {
-  const task = `The user describes this situation:
-
-"${description}"
-
-Return a single JSON object with exactly this structure:
-{
-  "pattern": {
-    "label": "<short clinical name>",
-    "short": "<2-3 word version>",
-    "coreBelief": "<the specific belief driving this, one sentence>",
-    "symptoms": ["<symptom 1>", "<symptom 2>", "<symptom 3>", "<symptom 4>"],
-    "cognitiveLabels": ["<CBT distortion 1>", "<CBT distortion 2>", "<CBT distortion 3>"],
-    "note": "<which known patterns this relates to>"
-  },
-  "analysis": {
-    "analyzedAt": "<ISO date string>",
-    "summary": "<2-3 sentence clinical narrative>",
-    "schemaActivated": ["<schema name>"],
-    "responseMode": "<Surrender or Escape or Counterattack>",
-    "systemsInvolved": ["<threat or drive or soothing>"],
-    "relatedPatterns": ["<P1 or P3 etc>"],
-    "bookMappings": [{"concept": "<name>", "source": "<book>", "relevance": "<one sentence>"}],
-    "practiceRecommendation": "<one specific concrete practice>"
-  }
-}`;
-
-  return `${SYSTEM}\n\n${task}`;
+  return `The user describes this situation:\n\n"${description}"\n\nExtract the pattern and clinical analysis. Limit bookMappings to a maximum of 2 highly relevant entries.`;
 }
 
 const STRING = { type: "STRING" } as const;
@@ -74,7 +53,6 @@ export const createFromDescriptionSchema: Record<string, unknown> = {
     analysis: {
       type: "OBJECT",
       properties: {
-        analyzedAt: { type: "STRING", description: "ISO 8601 datetime" },
         summary: STRING,
         schemaActivated: { type: "ARRAY", items: STRING },
         responseMode: { type: "STRING", enum: ["Surrender", "Escape", "Counterattack"] },
@@ -82,6 +60,8 @@ export const createFromDescriptionSchema: Record<string, unknown> = {
         relatedPatterns: { type: "ARRAY", items: STRING },
         bookMappings: {
           type: "ARRAY",
+          description: "Max 2 entries",
+          maxItems: 2,
           items: {
             type: "OBJECT",
             properties: { concept: STRING, source: STRING, relevance: STRING },
@@ -91,7 +71,7 @@ export const createFromDescriptionSchema: Record<string, unknown> = {
         practiceRecommendation: STRING,
       },
       required: [
-        "analyzedAt", "summary", "schemaActivated", "responseMode",
+        "summary", "schemaActivated", "responseMode",
         "systemsInvolved", "relatedPatterns", "bookMappings", "practiceRecommendation",
       ],
     },

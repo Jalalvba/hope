@@ -43,6 +43,8 @@ export interface GenerateJsonOptions {
   prompt: string;
   /** JSON schema constraining the model's response (Gemini structured output). */
   responseSchema: Record<string, unknown>;
+  /** Sent via Gemini's native `systemInstruction` field, not concatenated into `prompt`. */
+  systemInstruction?: string;
   model?: string;
   temperature?: number;
   maxOutputTokens?: number;
@@ -82,6 +84,9 @@ export async function generateJson<T = unknown>(
       },
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: opts.prompt }] }],
+        ...(opts.systemInstruction
+          ? { systemInstruction: { parts: [{ text: opts.systemInstruction }] } }
+          : {}),
         generationConfig: {
           temperature: opts.temperature ?? 0.2,
           maxOutputTokens: opts.maxOutputTokens ?? 8192,
