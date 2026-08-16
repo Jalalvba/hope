@@ -52,13 +52,15 @@ Light/dark is a global toggle (`components/ThemeToggle.tsx`, fixed top-right on 
 `mct` (Metacognitive Therapy reference data) is no longer queried anywhere in the app — the MCT RAG lookup was removed from `analyzePrompt.ts`. Treat any mention of MCT context as legacy.
 
 ### API Routes (`/app/api/patterns/`)
-- `route.ts` — GET all patterns, POST create new pattern (auto-increments ID: P12, P13...)
 - `[id]/route.ts` — GET, PATCH, DELETE a single pattern
 - `analyze/generate/route.ts` — POST `{ patternId, model? }`: assembles the analysis prompt (`lib/analyzePrompt.ts` — pulls RAG context from `ryl` and `hp`, keyword-scored top-N records, combined with a large fixed clinical system prompt that contains the user's real identity, history, and schema architecture — do not templatize or genericize this file), sends it to Gemini via `callGeminiWithTracking`, validates the response against `PatternAnalysis`, and returns `{ analysis, costInfo }`. Does not persist.
 - `[id]/analysis/route.ts` — PUT: validates a `PatternAnalysis` JSON object against the type shape and saves it onto the pattern; called by the frontend after the user reviews and confirms the `analyze/generate` result
-- `create-from-description/route.ts` — POST: takes a narrative description and returns an extract+analyze prompt (no RAG context, no AI call)
-- `create-from-paste/route.ts` — POST: validates a pasted `{ pattern, analysis }` JSON object, auto-assigns the next pattern ID, and inserts the new pattern; used after the user runs the `create-from-description` prompt manually
+- `create-from-description/generate/route.ts` — POST `{ description, model? }`: same clinical system instruction and RAG pipeline as `analyze/generate`, but extracts a new pattern's fields AND analyzes it in one call (`createPatternWithAnalysisSchema`). Does not persist.
+- `create-from-paste/route.ts` — POST: validates a pasted `{ pattern, analysis }` JSON object, auto-assigns the next pattern ID, and inserts the new pattern; called by `NewPatternButton` after the user reviews a `create-from-description/generate` draft
 - `field-options/route.ts` — GET: returns autocomplete options from the `fields` collection. Only returns `coreBeliefs`, `symptoms`, `cognitiveLabels` — there is no `notes` field in this collection, so any UI that expects note suggestions will get an empty list.
+
+### Output contract (`lib/patternAnalysisSchema.ts`)
+The Gemini `responseSchema` is the **single source of truth** for the analysis output shape. Per-field instructions live there as schema `description`s — there is deliberately no prose JSON example in the user prompt, because Gemini enforces the shape natively and an example object would duplicate thousands of input tokens per call and drift from the schema. Open-ended arrays carry `maxItems` as an output-token budget (`bookMappings` 2, `healingPath` 5) — `healingPath` entries copy full RAG records verbatim and are the one field that can truncate a response. `analyzedAt`/`generatedBy` are NOT in the schema: the model invents timestamps, so both are stamped server-side in the route after the call returns. The schema constrains output; `lib/validatePatternAnalysis.ts` is still the gate before anything persists.
 
 ### Key Types (`/types/`)
 - `Pattern` — core entity with `id` (P-prefixed string), `label`, `coreBelief`, `symptoms[]`, `cognitiveLabels[]`, optional `analysis`

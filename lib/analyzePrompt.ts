@@ -328,7 +328,6 @@ Layer 3 — Schema/developmental/neurological: Named, understood, origin correct
 ══════════════════════════════════════════════════════
 RESPONSE RULES — NON-NEGOTIABLE
 ══════════════════════════════════════════════════════
-— Respond ONLY with valid JSON. No preamble. No markdown. No code fences. Start with { end with }.
 — Map every activation to the existing architecture before introducing anything new.
 — DEFECTIVENESS DOES NOT APPLY. Do not use it as primary schema under any circumstances.
 — Root is Unrelenting Standards (observation-based, ego-syntonic, conditional schema). Not shame. Not abuse.
@@ -353,79 +352,15 @@ RESPONSE RULES — NON-NEGOTIABLE
 — Do not tell the patient to calm his amygdala. Tell him how to train the basal ganglia.
 — No citation theater. Apply actual mechanics of the theories.
 — Goal is clarity then specific practice — not comfort.
-— Every analysis ends with a concrete path from understanding to action.
-— Healing Path: when records provided, select 3-5 exercises ordered: (1) immediate in-the-moment, (2) daily practice, (3) weekly deeper work, (4) schema-level if applicable. Use exact data from records only.`;
+— Every analysis ends with a concrete path from understanding to action.`;
 
 
-// ─── User prompt builder ──────────────────────────────────────────────────────
-// The detailed analysis JSON shape is identical whether the pattern already
-// exists (analyze/generate) or is being extracted from a fresh description
-// (create-from-description/generate) — shared here so the two entry points
-// can't drift on what "analysis" means.
-
-const ANALYSIS_JSON_TEMPLATE = `{
-  "summary": "<4-5 sentence clinical narrative. (1) Name the exact schema(s) active and which mechanism is driving. (2) Trace to classroom-to-AVIS equation OR childhood origin OR DEKRA confirmation — whichever is most precise for this specific activation. (3) Name the dominant Gilbert system and why. (4) State what this pattern functionally maintains — specifically whether it is protecting the IMAGE of competence at cost of actual effectiveness. (5) Name the mode most active and its specific behavioral expression in this activation.>",
-
-  "woundActivation": "<one precise sentence — which specific formation is echoing here: the classroom scanning system, the family observation system, or the DEKRA confirmation event. Be specific to this activation.>",
-
-  "schemaActivated": ["Unrelenting Standards" | "Subjugation" | "Failure"],
-
-  "responseMode": "Surrender" | "Escape" | "Counterattack" | "Regulation",
-
-  "operationalFact": "<what is objectively true in this situation, cleanly separated from schema construction. One sentence, specific to this activation — what actually happened.>",
-
-  "schemaNarrative": "<what the Demanding Critic constructed on top of that operational fact. The exact threat narrative. What the schema said this situation means about him and about the danger ahead.>",
-
-  "systemsInvolved": ["threat" | "drive" | "soothing"],
-
-  "modesActive": ["Demanding_Critic" | "Vulnerable_Child" | "Angry_Rebel_Child" | "Detached_Protector" | "Compliant_Surrender" | "Healthy_Adult"],
-
-  "schemaMaintenanceBelief": "<the exact internalized Demanding Critic voice in this activation, quoted in first person. 'I must...' or 'If I don't...' or 'They will see that...' — one sentence maximum.>",
-
-  "whatTheSchemaIsConstructing": "<the catastrophe being predicted. What identity is at stake. What will happen if the standard is not met. Be precise to this activation, not generic.>",
-
-  "whatTheSituationActuallyNeeds": "<what does this situation actually require, given the patient's role at AVIS — separated from schema demands. Usually much simpler.>",
-
-  "emotionalSchemaRunning": "<which Leahy emotional schema dimension is sustaining the activation here — duration (belief the feeling will last forever if not managed), controllability (belief the feeling must be controlled or it overwhelms), validation (belief others don't feel this), or rumination (belief that analyzing provides control). One sentence naming the dimension and how it shows up in this specific activation.>",
-
-  "relatedPatterns": ["<P1 through P17 — all that share the same underlying mechanism as this activation>"],
-
-  "bookMappings": [
-    {
-      "concept": "<exact concept name from the provided records>",
-      "source": "<exact book title>",
-      "relevance": "<one precise sentence connecting this concept to THIS specific activation — not generic schema therapy, specific to what fired here>"
-    }
-  ],
-
-  "regulationEvidence": "<if this activation resembles one of the 8 confirmed regulation instances, name which one and state what worked. Be specific. Or null.>",
-
-  "practiceRecommendation": "<one concrete, immediately actionable technique from the RAG records. Name it precisely. Give one specific step the patient can do today — not a description, an instruction.>",
-
-  "layerStatus": {
-    "behavioral": "<what actually happened at the behavioral level — did the patient act on the schema or regulate? If regulation occurred, name it.>",
-    "cognitive": "<did the patient separate operational fact from schema narrative? Was the mode identified in real time or only in retrospect?>",
-    "schema": "<which formation is driving this and what would need to shift at the deepest layer — be specific about whether this requires imagery work, a behavioral experiment, or continued attractor consolidation through repetition>"
-  },
-
-  "healingPath": [
-    {
-      "id": "<exact id from the Healing Path record>",
-      "source": "<exact sourceShort from the record>",
-      "framework": "<exact framework from the record>",
-      "name": "<exact exercise name from the record>",
-      "what": "<exact practice.what — do not paraphrase>",
-      "how": "<exact practice.how — do not truncate>",
-      "when": "<exact practice.when>",
-      "duration": "<exact practice.duration>",
-      "frequency": "<exact practice.frequency>",
-      "successMarker": "<exact practice.successMarker>",
-      "whyThisPattern": "<1-2 sentences: WHY this exercise applies to THIS specific activation — reference the mechanism, not generic. Name what in this pattern this exercise directly addresses.>"
-    }
-  ]
-}
-
-HEALING PATH: Select 3-5 exercises ordered (1) immediate in-the-moment technique, (2) daily practice protocol, (3) weekly deeper work, (4) schema-level work if applicable. Use exact record data for all fields except whyThisPattern. If no records provided, return healingPath as [].`;
+// ─── User prompt builders ─────────────────────────────────────────────────────
+// These carry ONLY the case data plus its RAG context. The output contract —
+// field list, per-field instructions, ordering rules — lives entirely in the
+// Gemini responseSchema (lib/patternAnalysisSchema.ts), which enforces the
+// shape natively. Restating it here as a prose JSON example would duplicate
+// several thousand input tokens on every call and could drift from the schema.
 
 function buildUserPrompt(pattern: Pattern, rylContext: string, hpContext: string): string {
   const p = pattern as Pattern & Record<string, unknown>;
@@ -442,25 +377,13 @@ function buildUserPrompt(pattern: Pattern, rylContext: string, hpContext: string
   if (p.situationDescription) lines.push(`Situation: ${p.situationDescription}`);
   if (p.triggerContext) lines.push(`Trigger context: ${p.triggerContext}`);
 
-  return lines.join("\n") +
-    `\n\nReturn EXACTLY this JSON — no preamble, no code fences, start with { end with }:\n\n${ANALYSIS_JSON_TEMPLATE}${rylContext}${hpContext}`;
+  return lines.join("\n") + rylContext + hpContext;
 }
 
 function buildCreateFromDescriptionUserPrompt(description: string, rylContext: string, hpContext: string): string {
   return `The user describes this situation:\n\n"${description}"\n\n` +
-    `Extract a new pattern from it AND analyze it in the same response. ` +
-    `Return EXACTLY this JSON — no preamble, no code fences, start with { end with }:\n\n` +
-    `{\n` +
-    `  "pattern": {\n` +
-    `    "label": "<short clinical name>",\n` +
-    `    "short": "<2-3 word version>",\n` +
-    `    "coreBelief": "<the specific belief driving this, one sentence>",\n` +
-    `    "symptoms": ["<symptom 1>", "<symptom 2>", "<symptom 3>", "<symptom 4>"],\n` +
-    `    "cognitiveLabels": ["<CBT distortion 1>", "<CBT distortion 2>", "<CBT distortion 3>"],\n` +
-    `    "note": "<which known patterns (P1-P17) this relates to>"\n` +
-    `  },\n` +
-    `  "analysis": ${ANALYSIS_JSON_TEMPLATE}\n` +
-    `}${rylContext}${hpContext}`;
+    `Extract a new pattern from it AND analyze that pattern, in one response.` +
+    rylContext + hpContext;
 }
 
 // ─── Shared assembly ──────────────────────────────────────────────────────────
@@ -471,7 +394,7 @@ function buildCreateFromDescriptionUserPrompt(description: string, rylContext: s
 // description with no pattern extracted yet.
 
 export type AssembledPrompt =
-  | { ok: true; systemInstruction: string; prompt: string; pattern: Pattern }
+  | { ok: true; systemInstruction: string; prompt: string }
   | { ok: false; error: string; status: number };
 
 // Sent by POST /api/patterns/analyze/generate — re-analyzes a pattern that
@@ -486,7 +409,7 @@ export async function assembleAnalysisPrompt(patternId: string): Promise<Assembl
   const { rylContext, hpContext } = await gatherRagContext(db, extractKeywords(pattern));
   const userPrompt = buildUserPrompt(pattern, rylContext, hpContext);
 
-  return { ok: true, systemInstruction: CLINICAL_CONTEXT_DETAILED, prompt: userPrompt, pattern };
+  return { ok: true, systemInstruction: CLINICAL_CONTEXT_DETAILED, prompt: userPrompt };
 }
 
 // Sent by POST /api/patterns/create-from-description/generate — extracts a
