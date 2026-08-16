@@ -1,8 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import type { PatternAnalysis, HealingStep } from "@/types";
-import { stripJsonFences } from "@/lib/validatePatternAnalysis";
+import { useState, useEffect, useRef } from "react";
+import type { PatternAnalysis, HealingStep, CostInfo } from "@/types";
+import { CostBadge } from "@/components/CostBadge";
+import { GeminiModelSelect } from "@/components/GeminiModelSelect";
+import { DEFAULT_MODEL_ID, nextCapableModel } from "@/lib/geminiModels";
+import { useGeminiModels } from "@/lib/useGeminiModels";
 
 const SCHEMA_CLS: Record<string, string> = {
   Failure: "text-gold-400",
@@ -23,6 +26,17 @@ const SYS_CLS: Record<string, string> = {
 
 function fmtDate(d: Date | string) {
   return new Date(d).toLocaleDateString("fr-MA", { day: "2-digit", month: "short", year: "numeric" });
+}
+
+// Attribution for the analysis header: the live path always stamps an exact
+// model id server-side. Anything with no provenance — analyses saved before
+// generatedBy existed — gets a neutral label rather than a guessed one.
+function sourceLabel(generatedBy?: string): string {
+  if (!generatedBy) return "Analysis";
+  const m = generatedBy.toLowerCase();
+  if (m.includes("gemini")) return "Gemini Analysis";
+  if (m.includes("claude")) return "Claude Analysis";
+  return "Analysis";
 }
 
 const FRAMEWORK_COLORS: Record<string, string> = {
@@ -127,7 +141,7 @@ function Label({ children }: { children: React.ReactNode }) {
   );
 }
 
-function PromptFlow({
+function LiveFlow({
   patternId,
   onSaved,
   onCancel,
@@ -136,131 +150,193 @@ function PromptFlow({
   onSaved: (a: PatternAnalysis) => void;
   onCancel: () => void;
 }) {
-  const [stage, setStage] = useState<"generating" | "ready" | "saving">("generating");
-  const [prompt, setPrompt] = useState("");
-  const [pasted, setPasted] = useState("");
+  const [stage, setStage] = useState<"select" | "generating" | "review" | "saving" | "failed">("select");
+  const { models, defaultModelId } = useGeminiModels();
+  const [model, setModel] = useState(DEFAULT_MODEL_ID);
+  const [draft, setDraft] = useState<PatternAnalysis | null>(null);
   const [error, setError] = useState("");
-  const [copied, setCopied] = useState(false);
+  // Cost of the generate call, carried back on the same response as the draft.
+  // Kept even on failure — a call that produced unusable output still cost money.
+  const [costInfo, setCostInfo] = useState<CostInfo | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
+  useEffect(() => () => abortRef.current?.abort(), []);
+
+  // Once the live model list loads, adopt its default instead of the static
+  // fallback — only while still on the initial pick, so it never clobbers a
+  // choice the user already made (or a retry escalation already in flight).
   useEffect(() => {
-    (async () => {
-      try {
-        const res = await fetch("/api/patterns/analyze", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ patternId }),
-        });
-        const json = await res.json();
-        if (!res.ok) throw new Error(json.error);
-        setPrompt(json.data.prompt);
-        setStage("ready");
-      } catch (e: unknown) {
-        setError(e instanceof Error ? e.message : "Failed to generate prompt");
-        setStage("ready");
-      }
-    })();
-  }, [patternId]);
+    if (stage === "select" && model === DEFAULT_MODEL_ID && defaultModelId !== DEFAULT_MODEL_ID) {
+      setModel(defaultModelId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultModelId]);
 
-  const copyPrompt = async () => {
-    await navigator.clipboard.writeText(prompt);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+  const generate = async () => {
+    setError("");
+    setStage("generating");
+    const controller = new AbortController();
+    abortRef.current = controller;
+    try {
+      const res = await fetch("/api/patterns/analyze/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ patternId, model }),
+        signal: controller.signal,
+      });
+      const json = await res.json();
+      if (json.costInfo) setCostInfo(json.costInfo);
+      if (!res.ok) throw new Error(json.error);
+      setCostInfo(json.data.costInfo ?? null);
+      setDraft(json.data.analysis);
+      setStage("review");
+    } catch (e: unknown) {
+      if (controller.signal.aborted) return;
+      setError(e instanceof Error ? e.message : "Analysis failed");
+      // A call failing (rate limit, unusable output) is the escalation
+      // trigger: default the retry to the next more-capable tier rather than
+      // repeating the model that just failed. Still a suggestion — the
+      // dropdown lets the user override before retrying.
+      setModel((m) => nextCapableModel(m, models)?.id ?? m);
+      setStage("failed");
+    }
   };
 
   const save = async () => {
     setError("");
-    let parsed: unknown;
-    try {
-      parsed = JSON.parse(stripJsonFences(pasted));
-    } catch {
-      setError("That doesn't look like valid JSON. Paste the exact response from Claude/Gemini's chat UI.");
-      return;
-    }
     setStage("saving");
     try {
       const res = await fetch(`/api/patterns/${patternId}/analysis`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ analysis: parsed }),
+        body: JSON.stringify({ analysis: draft }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error);
       onSaved(json.data.analysis);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed to save analysis");
-      setStage("ready");
+      setStage("review");
     }
   };
+
+  const modelPicker = (
+    <GeminiModelSelect
+      value={model}
+      onChange={setModel}
+      models={models}
+      disabled={stage === "generating" || stage === "saving"}
+    />
+  );
 
   return (
     <div className="glass rounded-xl p-5 space-y-4 border-l-2 border-gold-400/25">
       <div className="flex items-center justify-between">
         <span className="text-[10px] text-gold-400/70 uppercase tracking-widest font-medium">
-          Manual analysis
+          Gemini analysis
         </span>
         <button onClick={onCancel} className="text-parchment-300/30 hover:text-parchment-300/60 text-sm leading-none">
           Cancel
         </button>
       </div>
 
-      {stage === "generating" ? (
+      {stage === "select" && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-[10px] text-parchment-300/40 uppercase tracking-widest">Model</p>
+            {modelPicker}
+          </div>
+          <button
+            onClick={generate}
+            className="w-full py-2.5 rounded-lg text-sm font-medium border border-gold-400/25 text-gold-400 bg-gold-400/10 hover:bg-gold-400/20 transition-colors"
+          >
+            Generate analysis
+          </button>
+        </div>
+      )}
+
+      {stage === "generating" && (
         <div className="flex items-center gap-3 py-4">
           <div className="w-4 h-4 rounded-full border border-gold-400/30 border-t-gold-400 animate-spin" />
-          <p className="text-xs text-parchment-300/40">Assembling prompt…</p>
+          <p className="text-xs text-parchment-300/40">Analyzing…</p>
         </div>
-      ) : (
-        <>
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
-              <p className="text-[10px] text-parchment-300/40 uppercase tracking-widest">
-                1. Copy this prompt into Claude or Gemini&apos;s chat UI
-              </p>
-              <button
-                onClick={copyPrompt}
-                disabled={!prompt}
-                className="text-[10px] text-gold-400/60 hover:text-gold-400 transition-colors disabled:opacity-30"
-              >
-                {copied ? "Copied ✓" : "Copy"}
-              </button>
-            </div>
-            <textarea
-              readOnly
-              value={prompt}
-              rows={6}
-              className="w-full text-[11px] font-mono text-parchment-200/60 bg-ink-950/40 rounded-lg p-3 leading-relaxed resize-y"
-            />
-          </div>
+      )}
 
-          <div className="space-y-1.5">
+      {stage === "failed" && (
+        <div className="space-y-3">
+          <p className="text-xs text-rust-400 bg-rust-400/8 px-3 py-2 rounded-lg">{error}</p>
+          {costInfo && <CostBadge costInfo={costInfo} />}
+          <div className="flex items-center justify-between gap-3">
             <p className="text-[10px] text-parchment-300/40 uppercase tracking-widest">
-              2. Paste the JSON response back here
+              Try a different model
             </p>
-            <textarea
-              value={pasted}
-              onChange={(e) => setPasted(e.target.value)}
-              placeholder="{ ...pasted JSON... }"
-              rows={6}
-              disabled={stage === "saving"}
-              className="w-full text-[11px] font-mono text-parchment-100 bg-ink-950/40 rounded-lg p-3 leading-relaxed resize-y placeholder-parchment-300/20 disabled:opacity-50"
-            />
+            {modelPicker}
+          </div>
+          <button
+            onClick={generate}
+            className="w-full py-2.5 rounded-lg text-sm font-medium border border-gold-400/25 text-gold-400 bg-gold-400/10 hover:bg-gold-400/20 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
+      {(stage === "review" || stage === "saving") && draft && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-[10px] text-parchment-300/40 uppercase tracking-widest">
+              Review before saving
+            </p>
+            {costInfo && <CostBadge costInfo={costInfo} className="justify-end" />}
+          </div>
+          <p className="text-sm text-parchment-100/80 leading-relaxed">{draft.summary}</p>
+          <div className="flex flex-wrap gap-1.5">
+            {(Array.isArray(draft.schemaActivated) ? draft.schemaActivated : []).map((s) => (
+              <span key={s} className="text-[10px] px-2 py-0.5 rounded-full bg-gold-400/10 text-gold-400/80">
+                {s}
+              </span>
+            ))}
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-gold-400/10 text-gold-400/80">
+              {draft.responseMode}
+            </span>
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-gold-400/10 text-gold-400/80">
+              {(Array.isArray(draft.healingPath) ? draft.healingPath : []).length} healing steps
+            </span>
           </div>
 
           {error && (
             <p className="text-xs text-rust-400 bg-rust-400/8 px-3 py-2 rounded-lg break-all">{error}</p>
           )}
 
-          <button
-            onClick={save}
-            disabled={!pasted.trim() || stage === "saving"}
-            className="w-full py-2.5 rounded-lg text-sm font-medium border border-gold-400/25 text-gold-400 bg-gold-400/10 hover:bg-gold-400/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            {stage === "saving" ? "Saving…" : "Validate & save"}
-          </button>
-        </>
+          <div className="flex gap-2">
+            <button
+              onClick={save}
+              disabled={stage === "saving"}
+              className="flex-1 py-2.5 rounded-lg text-sm font-medium border border-gold-400/25 text-gold-400 bg-gold-400/10 hover:bg-gold-400/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {stage === "saving" ? "Saving…" : "Save analysis"}
+            </button>
+            <button
+              onClick={() => setStage("select")}
+              disabled={stage === "saving"}
+              className="px-4 py-2.5 rounded-lg text-sm text-parchment-300/40 hover:text-parchment-300/70 transition-colors disabled:opacity-40"
+            >
+              Different model
+            </button>
+            <button
+              onClick={onCancel}
+              disabled={stage === "saving"}
+              className="px-4 py-2.5 rounded-lg text-sm text-parchment-300/40 hover:text-parchment-300/70 transition-colors disabled:opacity-40"
+            >
+              Discard
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
 }
+
 
 export function AnalysisSection({
   patternId,
@@ -270,16 +346,16 @@ export function AnalysisSection({
   existingAnalysis: PatternAnalysis | null;
 }) {
   const [analysis, setAnalysis] = useState<PatternAnalysis | null>(existingAnalysis);
-  const [showPromptFlow, setShowPromptFlow] = useState(false);
+  const [flow, setFlow] = useState<null | "live">(null);
 
-  if (showPromptFlow) {
+  if (flow === "live") {
     return (
-      <PromptFlow
+      <LiveFlow
         patternId={patternId}
-        onCancel={() => setShowPromptFlow(false)}
+        onCancel={() => setFlow(null)}
         onSaved={(a) => {
           setAnalysis(a);
-          setShowPromptFlow(false);
+          setFlow(null);
         }}
       />
     );
@@ -290,10 +366,10 @@ export function AnalysisSection({
       <div className="glass rounded-xl p-8 flex flex-col items-center gap-3">
         <p className="text-xs text-parchment-300/40">No analysis yet.</p>
         <button
-          onClick={() => setShowPromptFlow(true)}
+          onClick={() => setFlow("live")}
           className="text-xs text-gold-400/70 hover:text-gold-400 transition-colors border border-gold-400/25 rounded-lg px-4 py-2"
         >
-          Generate analysis prompt
+          Analyze with Gemini
         </button>
       </div>
     );
@@ -313,8 +389,16 @@ export function AnalysisSection({
         <div className="flex items-center gap-2">
           <span className="text-gold-400">✦</span>
           <span className="text-[10px] text-gold-400/70 uppercase tracking-widest font-medium">
-            Claude Analysis
+            {sourceLabel(analysis.generatedBy)}
           </span>
+          {analysis.generatedBy && (
+            <span
+              title={analysis.generatedBy}
+              className="text-[9px] font-mono text-parchment-300/25 border border-parchment-300/10 rounded px-1.5 py-0.5"
+            >
+              {analysis.generatedBy}
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-3">
           {analysis.analyzedAt && (
@@ -323,7 +407,7 @@ export function AnalysisSection({
             </span>
           )}
           <button
-            onClick={() => setShowPromptFlow(true)}
+            onClick={() => setFlow("live")}
             className="text-[10px] text-parchment-300/25 hover:text-gold-400/50 transition-colors"
           >
             Regenerate

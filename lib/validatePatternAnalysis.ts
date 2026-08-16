@@ -7,14 +7,6 @@ export type ValidationResult<T> =
 const RESPONSE_MODES = ["Surrender", "Escape", "Counterattack", "Regulation"];
 const SYSTEMS = ["threat", "drive", "soothing"];
 
-export function stripJsonFences(s: string): string {
-  return s
-    .replace(/^```json\s*/i, "")
-    .replace(/^```\s*/i, "")
-    .replace(/\s*```$/i, "")
-    .trim();
-}
-
 function isStringArray(v: unknown): v is string[] {
   return Array.isArray(v) && v.every((x) => typeof x === "string");
 }

@@ -1,4 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+// ─── Create-from-description prompt + schema ─────────────────────────────────
+// Shared by POST /api/patterns/create-from-description/generate: given a
+// narrative description, extracts a new pattern's fields AND analyzes it in
+// one Gemini call. Contains the user's real clinical profile — do not
+// templatize or genericize this file.
 
 const SYSTEM = `You are a clinical psychologist specialized in schema therapy (Young), metacognitive therapy (Wells), ACT (Ong & Twohig), CBT (Burns), confidence-based CBT (Sokol & Fox), and compassion-focused therapy (Gilbert).
 
@@ -20,7 +24,7 @@ KEY EQUATION: Student who couldn't say "I don't understand" = Manager who can't 
 
 Respond ONLY with a single valid JSON object. No preamble. No explanation. No markdown. No code fences. Start your response with { and end with }.`;
 
-function buildPrompt(description: string): string {
+export function buildCreateFromDescriptionPrompt(description: string): string {
   const task = `The user describes this situation:
 
 "${description}"
@@ -50,20 +54,47 @@ Return a single JSON object with exactly this structure:
   return `${SYSTEM}\n\n${task}`;
 }
 
-// Assembles the extract+analyze prompt as plain text for the user to paste
-// into Claude or Gemini's chat UI themselves. Does not call any AI API. The
-// JSON result is pasted back and saved via POST /api/patterns/create-from-paste.
-export async function POST(req: NextRequest) {
-  try {
-    const { description } = await req.json();
-    if (!description?.trim()) {
-      return NextResponse.json({ error: "Description required" }, { status: 400 });
-    }
+const STRING = { type: "STRING" } as const;
 
-    const prompt = buildPrompt(description.trim());
-
-    return NextResponse.json({ data: { prompt } });
-  } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 });
-  }
-}
+export const createFromDescriptionSchema: Record<string, unknown> = {
+  type: "OBJECT",
+  properties: {
+    pattern: {
+      type: "OBJECT",
+      properties: {
+        label: STRING,
+        short: STRING,
+        coreBelief: STRING,
+        symptoms: { type: "ARRAY", items: STRING },
+        cognitiveLabels: { type: "ARRAY", items: STRING },
+        note: STRING,
+      },
+      required: ["label", "short", "coreBelief", "symptoms", "cognitiveLabels", "note"],
+    },
+    analysis: {
+      type: "OBJECT",
+      properties: {
+        analyzedAt: { type: "STRING", description: "ISO 8601 datetime" },
+        summary: STRING,
+        schemaActivated: { type: "ARRAY", items: STRING },
+        responseMode: { type: "STRING", enum: ["Surrender", "Escape", "Counterattack"] },
+        systemsInvolved: { type: "ARRAY", items: { type: "STRING", enum: ["threat", "drive", "soothing"] } },
+        relatedPatterns: { type: "ARRAY", items: STRING },
+        bookMappings: {
+          type: "ARRAY",
+          items: {
+            type: "OBJECT",
+            properties: { concept: STRING, source: STRING, relevance: STRING },
+            required: ["concept", "source", "relevance"],
+          },
+        },
+        practiceRecommendation: STRING,
+      },
+      required: [
+        "analyzedAt", "summary", "schemaActivated", "responseMode",
+        "systemsInvolved", "relatedPatterns", "bookMappings", "practiceRecommendation",
+      ],
+    },
+  },
+  required: ["pattern", "analysis"],
+};

@@ -49,12 +49,39 @@ export interface PatternAnalysis {
   bookMappings: { concept: string; source: string; relevance: string }[];
   regulationEvidence?: string | null;
   practiceRecommendation: string;
+  /**
+   * Which model produced this analysis, e.g. "gemini-flash-lite-latest".
+   * Stamped server-side by the live path. Absent on analyses saved through
+   * the manual copy/paste flow and on anything analyzed before this existed.
+   */
+  generatedBy?: string;
   layerStatus?: {
     behavioral: string;
     cognitive: string;
     schema: string;
   };
   healingPath?: HealingStep[];
+}
+
+// ─── Gemini cost reporting ───────────────────────────────────────────────────
+// Returned inline by every Gemini-backed action alongside its result, so the UI
+// can show what the action cost in the same round trip. Lives here rather than
+// in lib/gemini-cost-tracker.ts so client components can import the type
+// without pulling the server-only tracker (and MongoDB) into the bundle.
+
+export interface CostInfo {
+  /** The concrete model that served the call, resolved from any rolling alias. */
+  model: string;
+  /** ESTIMATED from our own daily call count — see lib/gemini-cost-tracker.ts. */
+  tier: "free" | "paid";
+  inputTokens: number;
+  /** Visible output plus reasoning tokens; both bill at the output rate. */
+  outputTokens: number;
+  /** 0 on the free tier. */
+  costUsd: number;
+  costMad: number;
+  /** Prepaid balance remaining after this call. */
+  remainingCreditUsd: number;
 }
 
 // ─── Color helper ─────────────────────────────────────────────────────────────

@@ -1,6 +1,27 @@
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap");
 @import "tailwindcss";
 
+/*
+ * ─── Theming ──────────────────────────────────────────────────────────────
+ * Every component references these tokens by name (bg-ink-950, text-gold-400,
+ * ...) — Tailwind v4's @theme turns each entry below into a real CSS custom
+ * property on :root, so retheming happens entirely here, with zero changes
+ * to the ~290 utility-class usages across components.
+ *
+ * The token NAMES are literal (ink = dark surface, parchment = light text)
+ * because dark was the only mode this app had for a long time. In light
+ * mode the values invert — ink-950 becomes the (light) page background,
+ * parchment-100 becomes the (dark) body text — so the names read backwards
+ * in light mode. Renaming ~290 call sites to abstract names (surface-0,
+ * fg-primary, ...) would be the "clean" fix but is a much larger, riskier
+ * rewrite; not worth it for a personal app. Documented here so it isn't a
+ * surprise later.
+ *
+ * Dark is the bare :root default (unchanged from before theming existed —
+ * zero regression risk if next-themes' script fails to run). Light lives in
+ * :root[data-theme="light"], which next-themes sets from localStorage or
+ * matchMedia before first paint (see components/ThemeProvider.tsx).
+ */
 @theme {
   --font-display: "Playfair Display", Georgia, serif;
   --font-body: "DM Sans", sans-serif;
@@ -24,10 +45,58 @@
   --color-sage-500: #5e8062;
   --color-mist-400: #8b9cb0;
   --color-mist-500: #6b7e94;
+
+  /* Glass panel surfaces — decoupled from the ink-* scale (rather than
+     literal rgba() built from ink-800's hex, as before) so they can be
+     retuned per theme without fighting the "ink" name meaning something
+     different in light mode. */
+  --glass-bg: rgba(30, 27, 24, 0.55);
+  --glass-border: rgba(212, 196, 176, 0.07);
+  --glass-subtle-bg: rgba(45, 41, 37, 0.35);
+  --glass-subtle-border: rgba(212, 196, 176, 0.09);
+}
+
+/* Light theme — accent hues are deepened (not just inverted) versus their
+   dark-mode values, since the same hex at the same alpha reads fine on
+   near-black but fails text contrast on a light page. Checked against
+   WCAG AA (4.5:1) for the body/label tones at full opacity; many usages
+   apply further opacity on top for de-emphasis, same as in dark mode. */
+:root[data-theme="light"] {
+  --color-ink-950: #faf7f2;
+  --color-ink-900: #f0e9de;
+  --color-ink-800: #ffffff;
+  --color-ink-700: #c9b8a0;
+
+  --color-parchment-50: #14110d;
+  --color-parchment-100: #241f1a;
+  --color-parchment-200: #4a4038;
+  --color-parchment-300: #756a5c;
+
+  --color-gold-400: #b45309;
+  --color-gold-500: #92400e;
+  --color-rust-400: #b8452a;
+  --color-rust-500: #93331d;
+  --color-sage-400: #3f6b45;
+  --color-sage-500: #2f5236;
+  --color-mist-400: #45566b;
+  --color-mist-500: #34445a;
+
+  --glass-bg: rgba(255, 255, 255, 0.55);
+  --glass-border: rgba(36, 31, 26, 0.08);
+  --glass-subtle-bg: rgba(255, 255, 255, 0.45);
+  --glass-subtle-border: rgba(36, 31, 26, 0.1);
 }
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
+
+/* Tells the browser which UA palette to draw native, browser-rendered chrome
+   in — scrollbars, and critically, <select> popup listboxes, whose contents
+   (option/optgroup) our own CSS often can't reach. Without this, a <select>
+   styled dark can still open into a stark white native popup on some
+   browsers regardless of the color/background-color set on its <option>s. */
+:root { color-scheme: dark; }
+:root[data-theme="light"] { color-scheme: light; }
 
 body {
   background-color: var(--color-ink-950);
@@ -36,6 +105,7 @@ body {
   font-weight: 300;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 body::before {
@@ -44,6 +114,7 @@ body::before {
   inset: 0;
   pointer-events: none;
   z-index: 0;
+  background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(245, 158, 11, 0.06), transparent 60%);
 }
 
 ::-webkit-scrollbar { width: 3px; }
@@ -56,14 +127,14 @@ h1, h2, h3, h4 { font-family: var(--font-display); }
 textarea, input { background: transparent; outline: none; resize: none; }
 
 .glass {
-  background: rgba(30,27,24,0.55);
+  background: var(--glass-bg);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(212,196,176,0.07);
+  border: 1px solid var(--glass-border);
 }
 .glass-subtle {
-  background: rgba(45,41,37,0.35);
+  background: var(--glass-subtle-bg);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(212,196,176,0.09);
+  border: 1px solid var(--glass-subtle-border);
 }
 .field-ring { box-shadow: 0 0 0 1px rgba(245,158,11,0.12); transition: box-shadow 0.2s; }
 .field-ring:focus-within { box-shadow: 0 0 0 1px rgba(245,158,11,0.38), 0 2px 16px rgba(245,158,11,0.06); }

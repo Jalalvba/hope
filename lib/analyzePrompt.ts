@@ -1,4 +1,3 @@
-import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import clientPromise, { dbName } from "@/lib/mongo";
 import type { Pattern } from "@/types";
@@ -414,52 +413,45 @@ Return EXACTLY this JSON — no preamble, no code fences, start with { end with 
 HEALING PATH: Select 3-5 exercises ordered (1) immediate in-the-moment technique, (2) daily practice protocol, (3) weekly deeper work, (4) schema-level work if applicable. Use exact record data for all fields except whyThisPattern. If no records provided, return healingPath as [].`;
 }
 
-// ─── Route handler ────────────────────────────────────────────────────────────
-// Assembles the full analysis prompt (system prompt + RAG context + pattern
-// data) as plain text for the user to paste into Claude or Gemini's chat UI
-// themselves. Does not call any AI API. The result is pasted back and saved
-// via PUT /api/patterns/[id]/analysis.
+// ─── Shared assembly ──────────────────────────────────────────────────────────
+// Builds the full analysis prompt (system prompt + RAG context + pattern data)
+// sent to Gemini by POST /api/patterns/analyze/generate.
 
-export async function POST(req: NextRequest) {
-  try {
-    const { patternId } = await req.json();
-    const mongo = await clientPromise;
-    const db = mongo.db(DB);
+export type AssembledPrompt =
+  | { ok: true; prompt: string; pattern: Pattern }
+  | { ok: false; error: string; status: number };
 
-    const pattern = await db.collection<Pattern>("psy").findOne(buildQuery(patternId));
-    if (!pattern) return NextResponse.json({ error: "Not found" }, { status: 404 });
+export async function assembleAnalysisPrompt(patternId: string): Promise<AssembledPrompt> {
+  const mongo = await clientPromise;
+  const db = mongo.db(DB);
 
-    const [rylRaw, hpRaw] = await Promise.all([
-      db.collection("ryl").find({}).toArray(),
-      db.collection("hp").find({}).toArray(),
-    ]);
+  const pattern = await db.collection<Pattern>("psy").findOne(buildQuery(patternId));
+  if (!pattern) return { ok: false, error: "Not found", status: 404 };
 
-    const keywords = extractKeywords(pattern);
+  const [rylRaw, hpRaw] = await Promise.all([
+    db.collection("ryl").find({}).toArray(),
+    db.collection("hp").find({}).toArray(),
+  ]);
 
-    const rylRecords = rylRaw.length > 0
-      ? pickTop(rylRaw as Record<string, unknown>[], keywords, 8, RYL_PRIORITY)
-      : [];
-    const hpRecords = hpRaw.length > 0
-      ? pickTop(hpRaw as Record<string, unknown>[], keywords, 8, HP_PRIORITY)
-      : [];
+  const keywords = extractKeywords(pattern);
 
-    const rylContext = rylRecords.length > 0
-      ? `\n\n══════════════════════════════════════════════════════\nRAG — SCHEMA THERAPY REFERENCE RECORDS\n══════════════════════════════════════════════════════\n${rylRecords.map(formatRecord).join("\n\n")}`
-      : "";
+  const rylRecords = rylRaw.length > 0
+    ? pickTop(rylRaw as Record<string, unknown>[], keywords, 8, RYL_PRIORITY)
+    : [];
+  const hpRecords = hpRaw.length > 0
+    ? pickTop(hpRaw as Record<string, unknown>[], keywords, 8, HP_PRIORITY)
+    : [];
 
-    const hpContext = hpRecords.length > 0
-      ? `\n\n══════════════════════════════════════════════════════\nHEALING PATH — PRACTICE RECORDS (18-book library)\n══════════════════════════════════════════════════════\n${hpRecords.map(formatHPRecord).join("\n\n")}`
-      : "";
+  const rylContext = rylRecords.length > 0
+    ? `\n\n══════════════════════════════════════════════════════\nRAG — SCHEMA THERAPY REFERENCE RECORDS\n══════════════════════════════════════════════════════\n${rylRecords.map(formatRecord).join("\n\n")}`
+    : "";
 
-    const SYSTEM = buildSystemPrompt(rylContext, hpContext);
-    const userPrompt = buildUserPrompt(pattern);
+  const hpContext = hpRecords.length > 0
+    ? `\n\n══════════════════════════════════════════════════════\nHEALING PATH — PRACTICE RECORDS (18-book library)\n══════════════════════════════════════════════════════\n${hpRecords.map(formatHPRecord).join("\n\n")}`
+    : "";
 
-    const prompt = `${SYSTEM}\n\n${userPrompt}`;
+  const SYSTEM = buildSystemPrompt(rylContext, hpContext);
+  const userPrompt = buildUserPrompt(pattern);
 
-    return NextResponse.json({ data: { prompt } });
-
-  } catch (err) {
-    console.error("[analyze]", err);
-    return NextResponse.json({ error: String(err) }, { status: 500 });
-  }
+  return { ok: true, prompt: `${SYSTEM}\n\n${userPrompt}`, pattern };
 }
