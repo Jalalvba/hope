@@ -88,3 +88,28 @@ export const patternAnalysisSchema: Record<string, unknown> = {
     "healingPath",
   ],
 };
+
+// Used by POST /api/patterns/create-from-description/generate, which extracts
+// a brand-new pattern's fields AND analyzes it (against patternAnalysisSchema
+// above) in a single call.
+export const patternExtractionSchema: Record<string, unknown> = {
+  type: "OBJECT",
+  properties: {
+    label: STRING,
+    short: STRING,
+    coreBelief: STRING,
+    symptoms: { type: "ARRAY", items: STRING },
+    cognitiveLabels: { type: "ARRAY", items: STRING },
+    note: STRING,
+  },
+  required: ["label", "short", "coreBelief", "symptoms", "cognitiveLabels", "note"],
+};
+
+export const createPatternWithAnalysisSchema: Record<string, unknown> = {
+  type: "OBJECT",
+  properties: {
+    pattern: patternExtractionSchema,
+    analysis: patternAnalysisSchema,
+  },
+  required: ["pattern", "analysis"],
+};

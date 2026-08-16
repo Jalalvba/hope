@@ -1,4 +1,4 @@
-import { ObjectId } from "mongodb";
+import { ObjectId, type Db } from "mongodb";
 import clientPromise, { dbName } from "@/lib/mongo";
 import { ROOT_BELIEF } from "@/lib/clinicalProfile";
 import type { Pattern } from "@/types";
@@ -93,30 +93,59 @@ function buildQuery(id: string) {
   return ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { id };
 }
 
+const PROFILE_KEYWORDS = [
+  "unrelenting standards", "subjugation", "failure", "defectiveness",
+  "rumination", "hypervigilant", "anticipation", "overcompensation",
+  "angry child", "demanding parent", "demanding critic", "healthy adult",
+  "vulnerable child", "rebel", "detached protector",
+  "authority", "boss", "hierarchy", "competence", "incompetence",
+  "imagery rescripting", "chairwork", "flashcard", "mode work",
+  "behavioral experiment", "limited reparenting",
+  "threat system", "soothing", "dual focus", "attractor",
+];
+
+function extractKeywordsFromText(text: string): string[] {
+  const fromText = text.toLowerCase().split(/\W+/).filter((w) => w.length > 4);
+  return [...new Set([...PROFILE_KEYWORDS, ...fromText])];
+}
+
 function extractKeywords(pattern: Pattern): string[] {
   const p = pattern as Pattern & Record<string, unknown>;
-  const base = [
+  const text = [
     ...(pattern.symptoms ?? []),
     ...(pattern.cognitiveLabels ?? []),
     pattern.coreBelief ?? "",
     pattern.label ?? "",
     (p.note as string) ?? "",
     (p.situationDescription as string) ?? "",
-  ].join(" ").toLowerCase();
+  ].join(" ");
+  return extractKeywordsFromText(text);
+}
 
-  const profile = [
-    "unrelenting standards", "subjugation", "failure", "defectiveness",
-    "rumination", "hypervigilant", "anticipation", "overcompensation",
-    "angry child", "demanding parent", "demanding critic", "healthy adult",
-    "vulnerable child", "rebel", "detached protector",
-    "authority", "boss", "hierarchy", "competence", "incompetence",
-    "imagery rescripting", "chairwork", "flashcard", "mode work",
-    "behavioral experiment", "limited reparenting",
-    "threat system", "soothing", "dual focus", "attractor",
-  ];
+/** Fetches and keyword-scores the top RAG records for a set of keywords,
+ *  formatted as the two context blocks appended to the user prompt. */
+async function gatherRagContext(db: Db, keywords: string[]) {
+  const [rylRaw, hpRaw] = await Promise.all([
+    db.collection("ryl").find({}).toArray(),
+    db.collection("hp").find({}).toArray(),
+  ]);
 
-  const fromPattern = base.split(/\W+/).filter((w) => w.length > 4);
-  return [...new Set([...profile, ...fromPattern])];
+  const rylRecords = rylRaw.length > 0
+    ? pickTop(rylRaw as Record<string, unknown>[], keywords, 8, RYL_PRIORITY)
+    : [];
+  const hpRecords = hpRaw.length > 0
+    ? pickTop(hpRaw as Record<string, unknown>[], keywords, 8, HP_PRIORITY)
+    : [];
+
+  const rylContext = rylRecords.length > 0
+    ? `\n\n══════════════════════════════════════════════════════\nRAG — SCHEMA THERAPY REFERENCE RECORDS\n══════════════════════════════════════════════════════\n${rylRecords.map(formatRecord).join("\n\n")}`
+    : "";
+
+  const hpContext = hpRecords.length > 0
+    ? `\n\n══════════════════════════════════════════════════════\nHEALING PATH — PRACTICE RECORDS (18-book library)\n══════════════════════════════════════════════════════\n${hpRecords.map(formatHPRecord).join("\n\n")}`
+    : "";
+
+  return { rylContext, hpContext };
 }
 
 
@@ -329,27 +358,12 @@ RESPONSE RULES — NON-NEGOTIABLE
 
 
 // ─── User prompt builder ──────────────────────────────────────────────────────
+// The detailed analysis JSON shape is identical whether the pattern already
+// exists (analyze/generate) or is being extracted from a fresh description
+// (create-from-description/generate) — shared here so the two entry points
+// can't drift on what "analysis" means.
 
-function buildUserPrompt(pattern: Pattern, rylContext: string, hpContext: string): string {
-  const p = pattern as Pattern & Record<string, unknown>;
-  const lines = [
-    `PATTERN TO ANALYZE:`,
-    `ID: ${pattern.id}`,
-    `Label: ${pattern.label}`,
-    `Short: ${pattern.short}`,
-    `Core belief: ${pattern.coreBelief}`,
-    `Symptoms: ${(pattern.symptoms ?? []).join("; ")}`,
-    `Cognitive labels: ${(pattern.cognitiveLabels ?? []).join(", ")}`,
-  ];
-  if (pattern.note) lines.push(`Note: ${pattern.note}`);
-  if (p.situationDescription) lines.push(`Situation: ${p.situationDescription}`);
-  if (p.triggerContext) lines.push(`Trigger context: ${p.triggerContext}`);
-
-  return lines.join("\n") + `
-
-Return EXACTLY this JSON — no preamble, no code fences, start with { end with }:
-
-{
+const ANALYSIS_JSON_TEMPLATE = `{
   "summary": "<4-5 sentence clinical narrative. (1) Name the exact schema(s) active and which mechanism is driving. (2) Trace to classroom-to-AVIS equation OR childhood origin OR DEKRA confirmation — whichever is most precise for this specific activation. (3) Name the dominant Gilbert system and why. (4) State what this pattern functionally maintains — specifically whether it is protecting the IMAGE of competence at cost of actual effectiveness. (5) Name the mode most active and its specific behavioral expression in this activation.>",
 
   "woundActivation": "<one precise sentence — which specific formation is echoing here: the classroom scanning system, the family observation system, or the DEKRA confirmation event. Be specific to this activation.>",
@@ -411,17 +425,57 @@ Return EXACTLY this JSON — no preamble, no code fences, start with { end with 
   ]
 }
 
-HEALING PATH: Select 3-5 exercises ordered (1) immediate in-the-moment technique, (2) daily practice protocol, (3) weekly deeper work, (4) schema-level work if applicable. Use exact record data for all fields except whyThisPattern. If no records provided, return healingPath as [].${rylContext}${hpContext}`;
+HEALING PATH: Select 3-5 exercises ordered (1) immediate in-the-moment technique, (2) daily practice protocol, (3) weekly deeper work, (4) schema-level work if applicable. Use exact record data for all fields except whyThisPattern. If no records provided, return healingPath as [].`;
+
+function buildUserPrompt(pattern: Pattern, rylContext: string, hpContext: string): string {
+  const p = pattern as Pattern & Record<string, unknown>;
+  const lines = [
+    `PATTERN TO ANALYZE:`,
+    `ID: ${pattern.id}`,
+    `Label: ${pattern.label}`,
+    `Short: ${pattern.short}`,
+    `Core belief: ${pattern.coreBelief}`,
+    `Symptoms: ${(pattern.symptoms ?? []).join("; ")}`,
+    `Cognitive labels: ${(pattern.cognitiveLabels ?? []).join(", ")}`,
+  ];
+  if (pattern.note) lines.push(`Note: ${pattern.note}`);
+  if (p.situationDescription) lines.push(`Situation: ${p.situationDescription}`);
+  if (p.triggerContext) lines.push(`Trigger context: ${p.triggerContext}`);
+
+  return lines.join("\n") +
+    `\n\nReturn EXACTLY this JSON — no preamble, no code fences, start with { end with }:\n\n${ANALYSIS_JSON_TEMPLATE}${rylContext}${hpContext}`;
+}
+
+function buildCreateFromDescriptionUserPrompt(description: string, rylContext: string, hpContext: string): string {
+  return `The user describes this situation:\n\n"${description}"\n\n` +
+    `Extract a new pattern from it AND analyze it in the same response. ` +
+    `Return EXACTLY this JSON — no preamble, no code fences, start with { end with }:\n\n` +
+    `{\n` +
+    `  "pattern": {\n` +
+    `    "label": "<short clinical name>",\n` +
+    `    "short": "<2-3 word version>",\n` +
+    `    "coreBelief": "<the specific belief driving this, one sentence>",\n` +
+    `    "symptoms": ["<symptom 1>", "<symptom 2>", "<symptom 3>", "<symptom 4>"],\n` +
+    `    "cognitiveLabels": ["<CBT distortion 1>", "<CBT distortion 2>", "<CBT distortion 3>"],\n` +
+    `    "note": "<which known patterns (P1-P17) this relates to>"\n` +
+    `  },\n` +
+    `  "analysis": ${ANALYSIS_JSON_TEMPLATE}\n` +
+    `}${rylContext}${hpContext}`;
 }
 
 // ─── Shared assembly ──────────────────────────────────────────────────────────
-// Builds the full analysis prompt (system prompt + RAG context + pattern data)
-// sent to Gemini by POST /api/patterns/analyze/generate.
+// Both entry points below share the same clinical architecture
+// (CLINICAL_CONTEXT_DETAILED), the same RAG pipeline (gatherRagContext), and
+// the same analysis JSON shape (ANALYSIS_JSON_TEMPLATE) — the only difference
+// is where the pattern data comes from: an existing DB document, or a fresh
+// description with no pattern extracted yet.
 
 export type AssembledPrompt =
   | { ok: true; systemInstruction: string; prompt: string; pattern: Pattern }
   | { ok: false; error: string; status: number };
 
+// Sent by POST /api/patterns/analyze/generate — re-analyzes a pattern that
+// already exists in the `psy` collection.
 export async function assembleAnalysisPrompt(patternId: string): Promise<AssembledPrompt> {
   const mongo = await clientPromise;
   const db = mongo.db(DB);
@@ -429,29 +483,24 @@ export async function assembleAnalysisPrompt(patternId: string): Promise<Assembl
   const pattern = await db.collection<Pattern>("psy").findOne(buildQuery(patternId));
   if (!pattern) return { ok: false, error: "Not found", status: 404 };
 
-  const [rylRaw, hpRaw] = await Promise.all([
-    db.collection("ryl").find({}).toArray(),
-    db.collection("hp").find({}).toArray(),
-  ]);
-
-  const keywords = extractKeywords(pattern);
-
-  const rylRecords = rylRaw.length > 0
-    ? pickTop(rylRaw as Record<string, unknown>[], keywords, 8, RYL_PRIORITY)
-    : [];
-  const hpRecords = hpRaw.length > 0
-    ? pickTop(hpRaw as Record<string, unknown>[], keywords, 8, HP_PRIORITY)
-    : [];
-
-  const rylContext = rylRecords.length > 0
-    ? `\n\n══════════════════════════════════════════════════════\nRAG — SCHEMA THERAPY REFERENCE RECORDS\n══════════════════════════════════════════════════════\n${rylRecords.map(formatRecord).join("\n\n")}`
-    : "";
-
-  const hpContext = hpRecords.length > 0
-    ? `\n\n══════════════════════════════════════════════════════\nHEALING PATH — PRACTICE RECORDS (18-book library)\n══════════════════════════════════════════════════════\n${hpRecords.map(formatHPRecord).join("\n\n")}`
-    : "";
-
+  const { rylContext, hpContext } = await gatherRagContext(db, extractKeywords(pattern));
   const userPrompt = buildUserPrompt(pattern, rylContext, hpContext);
 
   return { ok: true, systemInstruction: CLINICAL_CONTEXT_DETAILED, prompt: userPrompt, pattern };
+}
+
+// Sent by POST /api/patterns/create-from-description/generate — extracts a
+// brand-new pattern from a narrative description AND analyzes it in the same
+// call, using the identical clinical architecture and RAG pipeline as
+// assembleAnalysisPrompt above (no separate, shallower prompt for this path).
+export async function assembleCreateFromDescriptionPrompt(
+  description: string
+): Promise<{ ok: true; systemInstruction: string; prompt: string }> {
+  const mongo = await clientPromise;
+  const db = mongo.db(DB);
+
+  const { rylContext, hpContext } = await gatherRagContext(db, extractKeywordsFromText(description));
+  const userPrompt = buildCreateFromDescriptionUserPrompt(description, rylContext, hpContext);
+
+  return { ok: true, systemInstruction: CLINICAL_CONTEXT_DETAILED, prompt: userPrompt };
 }

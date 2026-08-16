@@ -1,16 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { buildCreateFromDescriptionPrompt, createFromDescriptionSchema, CLINICAL_CONTEXT } from "@/lib/createPatternPrompt";
+import { assembleCreateFromDescriptionPrompt } from "@/lib/analyzePrompt";
 import { callGeminiWithTracking } from "@/lib/gemini-cost-tracker";
+import { createPatternWithAnalysisSchema } from "@/lib/patternAnalysisSchema";
 import { validateNewPatternFields, validatePatternAnalysis } from "@/lib/validatePatternAnalysis";
 
 // ─── Route handler ────────────────────────────────────────────────────────────
 // Given a narrative description, sends the extract+analyze prompt to Gemini in
-// JSON mode, validates both halves of the response, and returns them.
+// JSON mode, validates both halves of the response, and returns them. Uses the
+// same detailed clinical architecture and RAG pipeline as
+// POST /api/patterns/analyze/generate (lib/analyzePrompt.ts) — there is only
+// one analysis depth in this app, not a separate shallow one for new patterns.
 //
 // Deliberately does NOT persist. The client renders the draft for review and
 // saves it via POST /api/patterns/create-from-paste.
 
-const MAX_OUTPUT_TOKENS = 4096;
+// Same headroom as analyze/generate: this now asks for the full 18-field
+// detailed analysis, not just a handful of summary fields.
+const MAX_OUTPUT_TOKENS = 8192;
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,14 +25,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Description required" }, { status: 400 });
     }
 
-    const prompt = buildCreateFromDescriptionPrompt(description.trim());
+    const assembled = await assembleCreateFromDescriptionPrompt(description.trim());
 
     const result = await callGeminiWithTracking("create-from-description", {
-      prompt,
-      systemInstruction: CLINICAL_CONTEXT,
-      responseSchema: createFromDescriptionSchema,
+      prompt: assembled.prompt,
+      systemInstruction: assembled.systemInstruction,
+      responseSchema: createPatternWithAnalysisSchema,
       model: typeof model === "string" && model ? model : undefined,
-      temperature: 0.3,
+      temperature: 0.2,
       maxOutputTokens: MAX_OUTPUT_TOKENS,
     });
 
