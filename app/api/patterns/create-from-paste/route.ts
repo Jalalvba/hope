@@ -1,54 +1,43 @@
+/**
+ * Creates a new pattern from a reviewed `{ pattern, analysis }` draft.
+ *
+ * This is the save step of the "describe a situation" flow: POST
+ * /api/patterns/create-from-description/generate produces the draft, the user
+ * reads it in `NewPatternButton`, and confirming posts it here. The pattern's
+ * id is assigned by the server, not the client.
+ */
+
 import { NextRequest, NextResponse } from "next/server";
-import clientPromise, { dbName } from "@/lib/mongo";
-import type { Pattern, PatternAnalysis } from "@/types";
-import { validateNewPatternFields, validatePatternAnalysis } from "@/lib/validatePatternAnalysis";
+import { insertPatternWithAnalysis } from "@/lib/db/patterns";
+import { validateNewPatternFields, validatePatternAnalysis } from "@/lib/utils/validatePatternAnalysis";
 
-const DB = dbName;
-
-// Saves a {pattern, analysis} JSON object pasted back from Claude/Gemini's
-// chat UI after running the create-from-description prompt.
+/**
+ * POST — validates both halves of the draft, then inserts it.
+ *
+ * @param req - Body shaped `{ pattern, analysis }`.
+ * @returns `{ data: Pattern }` with status 201, including the assigned id.
+ */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    const patternResult = validateNewPatternFields(body.pattern);
-    if (!patternResult.valid) {
-      return NextResponse.json({ error: patternResult.error }, { status: 400 });
+    // Both halves are model output, so each is checked separately — this
+    // reports which half was wrong instead of one vague failure.
+    const patternValidation = validateNewPatternFields(body.pattern);
+    if (!patternValidation.valid) {
+      return NextResponse.json({ error: patternValidation.error }, { status: 400 });
     }
-    const analysisResult = validatePatternAnalysis(body.analysis);
-    if (!analysisResult.valid) {
-      return NextResponse.json({ error: analysisResult.error }, { status: 400 });
+    const analysisValidation = validatePatternAnalysis(body.analysis);
+    if (!analysisValidation.valid) {
+      return NextResponse.json({ error: analysisValidation.error }, { status: 400 });
     }
 
-    const mongo = await clientPromise;
-    const db = mongo.db(DB);
+    const created = await insertPatternWithAnalysis(
+      patternValidation.data,
+      analysisValidation.data
+    );
 
-    const patterns = await db.collection<Pattern>("psy")
-      .find({ type: "pattern" })
-      .project({ id: 1 })
-      .toArray();
-    const nums = patterns
-      .map((p) => parseInt(String(p.id).replace("P", "")))
-      .filter((n) => !isNaN(n));
-    const nextNum = nums.length > 0 ? Math.max(...nums) + 1 : 12;
-    const nextId = `P${nextNum}`;
-
-    const doc: Pattern & { analysis: PatternAnalysis; createdAt: Date; updatedAt: Date } = {
-      id: nextId,
-      type: "pattern",
-      ...patternResult.data,
-      analysis: analysisResult.data,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    const { _id: _omit, ...docToInsert } = doc;
-    const result = await db.collection("psy").insertOne(docToInsert);
-
-    return NextResponse.json({
-      data: { ...doc, _id: String(result.insertedId) },
-    }, { status: 201 });
-
+    return NextResponse.json({ data: created }, { status: 201 });
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 });
   }

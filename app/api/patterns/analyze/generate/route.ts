@@ -1,23 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
-import { assembleAnalysisPrompt } from "@/lib/analyzePrompt";
-import { callGeminiWithTracking } from "@/lib/gemini-cost-tracker";
-import { patternAnalysisSchema } from "@/lib/patternAnalysisSchema";
-import { validatePatternAnalysis } from "@/lib/validatePatternAnalysis";
+import { assembleAnalysisPrompt } from "@/lib/ai/analyzePrompt";
+import { callGeminiWithTracking } from "@/lib/ai/geminiCostTracker";
+import { patternAnalysisSchema } from "@/lib/ai/patternAnalysisSchema";
+import { validatePatternAnalysis } from "@/lib/utils/validatePatternAnalysis";
 
-// ─── Route handler ────────────────────────────────────────────────────────────
-// Sole analysis path: assembles the clinical prompt, sends it to Gemini in
-// JSON mode, validates the result against the PatternAnalysis shape, and
-// returns it. `model` lets the client re-run against a more capable tier
-// (see lib/geminiModels.ts) when a cheaper model's output isn't good enough —
-// that's the escalation path now, replacing the old manual copy/paste flow.
-//
-// Deliberately does NOT persist. The client renders the returned analysis for
-// review and saves it via PUT /api/patterns/[id]/analysis.
+/**
+ * Generates an analysis for a pattern that already exists.
+ *
+ * This route deliberately does NOT save anything. It costs money to call, so
+ * the user sees the result and decides — saving happens separately, via
+ * PUT /api/patterns/[id]/analysis.
+ */
 
 // The analysis prompt is ~30KB and asks for 18 fields including a healingPath
 // that copies record text verbatim, so allow generous headroom.
 const MAX_OUTPUT_TOKENS = 8192;
 
+/**
+ * POST — runs one analysis.
+ *
+ * @param req - Body shaped `{ patternId, model? }`. `model` lets the client
+ * re-run against a more capable tier when a cheaper model's output wasn't good
+ * enough; omitted, the server's default model is used.
+ * @returns `{ data: { analysis, costInfo } }`. On a model failure the error
+ * response still carries `costInfo`, because the call was billed either way.
+ */
 export async function POST(req: NextRequest) {
   try {
     const { patternId, model } = await req.json();
@@ -25,11 +32,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "patternId required" }, { status: 400 });
     }
 
+    // Step 1 — build the prompt: loads the pattern, retrieves matching
+    // reference records from MongoDB (the RAG step), and pairs them with the
+    // fixed clinical system instruction.
     const assembled = await assembleAnalysisPrompt(patternId);
     if (!assembled.ok) {
       return NextResponse.json({ error: assembled.error }, { status: assembled.status });
     }
 
+    // Step 2 — call Gemini. Every call goes through the tracker, which records
+    // the tokens and cost to MongoDB and hands back `costInfo`.
     const result = await callGeminiWithTracking("analyze", {
       prompt: assembled.prompt,
       systemInstruction: assembled.systemInstruction,
@@ -45,9 +57,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: result.error }, { status: result.status });
     }
 
-    // The model routinely invents analyzedAt rather than reporting the real
-    // time, so stamp it server-side from the actual generation — along with
-    // which model produced it, so the UI can attribute it honestly.
+    // Step 3 — stamp the provenance server-side. Models invent timestamps
+    // rather than reporting the real one, so `analyzedAt` is set here from the
+    // actual moment of generation, along with the concrete model that served
+    // the call, so the UI can attribute the analysis honestly.
     if (result.result && typeof result.result === "object") {
       const d = result.result as Record<string, unknown>;
       d.analyzedAt = new Date().toISOString();
@@ -55,6 +68,7 @@ export async function POST(req: NextRequest) {
       d.generatedBy = result.costInfo.model;
     }
 
+    // Step 4 — check the shape before it goes anywhere near the database.
     const validated = validatePatternAnalysis(result.result);
     if (!validated.valid) {
       console.error("[analyze/generate] schema mismatch:", validated.error);

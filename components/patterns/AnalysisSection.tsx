@@ -2,11 +2,24 @@
 
 import { useState, useEffect, useRef } from "react";
 import type { PatternAnalysis, HealingStep, CostInfo } from "@/types";
-import { CostBadge } from "@/components/CostBadge";
-import { GeminiModelSelect } from "@/components/GeminiModelSelect";
-import { DEFAULT_MODEL_ID, nextCapableModel } from "@/lib/geminiModels";
-import { useGeminiModels } from "@/lib/useGeminiModels";
+import { CostBadge } from "@/components/ui/CostBadge";
+import { GeminiModelSelect } from "@/components/ui/GeminiModelSelect";
+import { DEFAULT_MODEL_ID, nextCapableModel } from "@/lib/ai/geminiModels";
+import { useGeminiModels } from "@/lib/hooks/useGeminiModels";
 
+/**
+ * The analysis panel on a pattern's detail page.
+ *
+ * It covers the whole two-step analysis flow:
+ *   1. The user picks a Gemini model and generates an analysis. The result is
+ *      NOT saved yet — POST /api/patterns/analyze/generate only returns it,
+ *      along with what the call cost.
+ *   2. The user reads the draft and confirms, which saves it via
+ *      PUT /api/patterns/[id]/analysis.
+ * Once a pattern has a saved analysis, this renders it instead.
+ */
+
+/** Text colour per schema name, so the same schema always looks the same. */
 const SCHEMA_CLS: Record<string, string> = {
   Failure: "text-gold-400",
   "Unrelenting Standards": "text-mist-400",
@@ -24,18 +37,26 @@ const SYS_CLS: Record<string, string> = {
   soothing: "bg-sage-400/10 text-sage-400",
 };
 
-function fmtDate(d: Date | string) {
-  return new Date(d).toLocaleDateString("fr-MA", { day: "2-digit", month: "short", year: "numeric" });
+/** Formats a date the way it is displayed throughout the app. */
+function formatDate(date: Date | string) {
+  return new Date(date).toLocaleDateString("fr-MA", { day: "2-digit", month: "short", year: "numeric" });
 }
 
-// Attribution for the analysis header: the live path always stamps an exact
-// model id server-side. Anything with no provenance — analyses saved before
-// generatedBy existed — gets a neutral label rather than a guessed one.
+/**
+ * Works out the heading for the analysis panel.
+ *
+ * The live path always stamps the exact model id server-side. Older analyses
+ * saved before `generatedBy` existed have no provenance, so they get a neutral
+ * label rather than a guessed one.
+ *
+ * @param generatedBy - The model id that produced the analysis, if known.
+ * @returns A heading such as "Gemini Analysis", or plain "Analysis".
+ */
 function sourceLabel(generatedBy?: string): string {
   if (!generatedBy) return "Analysis";
-  const m = generatedBy.toLowerCase();
-  if (m.includes("gemini")) return "Gemini Analysis";
-  if (m.includes("claude")) return "Claude Analysis";
+  const modelId = generatedBy.toLowerCase();
+  if (modelId.includes("gemini")) return "Gemini Analysis";
+  if (modelId.includes("claude")) return "Claude Analysis";
   return "Analysis";
 }
 
@@ -49,10 +70,16 @@ const FRAMEWORK_LABELS: Record<string, string> = {
 
 const STEP_ICONS = ["⓵", "⓶", "⓷", "⓸", "⓹"];
 
+/**
+ * One exercise in the healing path, collapsed to its title until clicked.
+ *
+ * @param step - The exercise, copied from a Healing Path reference record.
+ * @param index - Its position in the path; the first one starts expanded.
+ */
 function HealingStepCard({ step, index }: { step: HealingStep; index: number }) {
   const [expanded, setExpanded] = useState(index === 0);
-  const fwClass = FRAMEWORK_COLORS[step.framework] ?? "text-parchment-300/50 bg-parchment-300/5 border-parchment-300/10";
-  const fwLabel = FRAMEWORK_LABELS[step.framework] ?? step.framework;
+  const frameworkClass = FRAMEWORK_COLORS[step.framework] ?? "text-parchment-300/50 bg-parchment-300/5 border-parchment-300/10";
+  const frameworkLabel = FRAMEWORK_LABELS[step.framework] ?? step.framework;
 
   return (
     <div className="rounded-lg border border-sage-400/10 overflow-hidden transition-all">
@@ -65,8 +92,8 @@ function HealingStepCard({ step, index }: { step: HealingStep; index: number }) 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs text-parchment-200/80 font-medium">{step.name}</span>
-            <span className={`text-[9px] px-1.5 py-px rounded border font-mono ${fwClass}`}>
-              {fwLabel}
+            <span className={`text-[9px] px-1.5 py-px rounded border font-mono ${frameworkClass}`}>
+              {frameworkLabel}
             </span>
           </div>
           {step.whyThisPattern && (
@@ -190,14 +217,14 @@ function LiveFlow({
       setCostInfo(json.data.costInfo ?? null);
       setDraft(json.data.analysis);
       setStage("review");
-    } catch (e: unknown) {
+    } catch (err: unknown) {
       if (controller.signal.aborted) return;
-      setError(e instanceof Error ? e.message : "Analysis failed");
+      setError(err instanceof Error ? err.message : "Analysis failed");
       // A call failing (rate limit, unusable output) is the escalation
       // trigger: default the retry to the next more-capable tier rather than
       // repeating the model that just failed. Still a suggestion — the
       // dropdown lets the user override before retrying.
-      setModel((m) => nextCapableModel(m, models)?.id ?? m);
+      setModel((currentModel) => nextCapableModel(currentModel, models)?.id ?? currentModel);
       setStage("failed");
     }
   };
@@ -214,8 +241,8 @@ function LiveFlow({
       const json = await res.json();
       if (!res.ok) throw new Error(json.error);
       onSaved(json.data.analysis);
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Failed to save analysis");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to save analysis");
       setStage("review");
     }
   };
@@ -338,6 +365,13 @@ function LiveFlow({
 }
 
 
+/**
+ * Entry point for the analysis panel: shows the saved analysis if there is
+ * one, and otherwise the controls to generate a new one.
+ *
+ * @param patternId - The pattern's MongoDB `_id`, used in the API calls.
+ * @param existingAnalysis - The saved analysis, or null if never analyzed.
+ */
 export function AnalysisSection({
   patternId,
   existingAnalysis,
@@ -403,7 +437,7 @@ export function AnalysisSection({
         <div className="flex items-center gap-3">
           {analysis.analyzedAt && (
             <span className="text-[10px] text-parchment-300/25 font-mono">
-              {fmtDate(analysis.analyzedAt)}
+              {formatDate(analysis.analyzedAt)}
             </span>
           )}
           <button

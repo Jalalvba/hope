@@ -12,8 +12,8 @@
 // the account's quota. Cross-check periodically against the real usage figures
 // at https://aistudio.google.com/  →  Usage & billing.
 
-import clientPromise, { dbName } from "@/lib/mongo";
-import { generateJson, DEFAULT_MODEL, type GenerateJsonOptions } from "@/lib/gemini";
+import { mongoClientPromise, dbName } from "@/lib/db/mongo";
+import { generateJson, DEFAULT_MODEL, type GenerateJsonOptions } from "@/lib/ai/gemini";
 import type { CostInfo } from "@/types";
 
 // ─── Pricing ──────────────────────────────────────────────────────────────────
@@ -39,7 +39,7 @@ export interface ModelPricing {
 
 // gemini-2.5-flash-lite and gemini-2.5-flash removed — verified 2026-08-16
 // that Google retired both on this API key (404 "no longer available to new
-// users"). Keep this in sync with lib/geminiModels.ts's GEMINI_MODELS list.
+// users"). Keep this in sync with lib/ai/geminiModels.ts's GEMINI_MODELS list.
 //
 // gemini-3.6-flash and gemini-3.7-flash added 2026-08-16, verified live on
 // this key. Introductory rate confirmed against
@@ -123,7 +123,7 @@ const LOG_COLLECTION = "usage_log";       // append-only, one doc per call
 const TOTALS_COLLECTION = "usage_totals"; // one doc per model, read-modify-write
 
 async function db() {
-  const client = await clientPromise;
+  const client = await mongoClientPromise;
   return client.db(dbName);
 }
 
@@ -277,7 +277,7 @@ export async function callGeminiWithTracking<T = unknown>(
   // different concrete model we re-price below but keep the reserved tier,
   // because the quota that was consumed was the one we counted against.
   //
-  // This also applies when generateJson (lib/gemini.ts) silently substitutes
+  // This also applies when generateJson (lib/ai/gemini.ts) silently substitutes
   // a 404'd model for its rolling alias: the substitution happens inside
   // generateJson, after this reservation, so a discovered-but-unentitled
   // model (no PRICING row → 0 free requests) always reserves "paid" here even
@@ -290,7 +290,7 @@ export async function callGeminiWithTracking<T = unknown>(
   const res = await generateJson<T>(opts);
   if (!res.ok) return res;
 
-  // Token counts come from the response's usageMetadata — see lib/gemini.ts for
+  // Token counts come from the response's usageMetadata — see lib/ai/gemini.ts for
   // where exactly they're read out of the payload.
   const { inputTokens, outputTokens } = res.usage;
 

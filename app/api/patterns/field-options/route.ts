@@ -1,26 +1,21 @@
-import { NextResponse } from "next/server";
-import clientPromise, { dbName } from "@/lib/mongo";
+/**
+ * Autocomplete options for the pattern edit form.
+ */
 
+import { NextResponse } from "next/server";
+import { findFieldOptions } from "@/lib/db/fields";
+
+/**
+ * GET — returns the predefined dropdown suggestions.
+ *
+ * @returns `{ data: { coreBeliefs, symptoms, cognitiveLabels } }`. Each list
+ * is empty rather than missing when the options document isn't there, so the
+ * form never has to guard against undefined.
+ */
 export async function GET() {
   try {
-    const client = await clientPromise;
-    const doc = await client.db(dbName).collection("fields")
-      .findOne({ _id: "clinical_fields_v1" } as any);
-
-    if (!doc) {
-      return NextResponse.json({
-        data: { coreBeliefs: [], symptoms: [], cognitiveLabels: [] }
-      });
-    }
-
-    return NextResponse.json({
-      data: {
-        coreBeliefs: doc.coreBeliefs ?? [],
-        symptoms: doc.symptoms ?? [],
-        cognitiveLabels: doc.cognitiveLabels ?? [],
-      }
-    });
+    return NextResponse.json({ data: await findFieldOptions() });
   } catch {
-    return NextResponse.json({ error: "Failed" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to load field options" }, { status: 500 });
   }
 }

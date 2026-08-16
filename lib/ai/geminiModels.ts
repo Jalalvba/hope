@@ -1,12 +1,12 @@
 // ─── Gemini model registry ─────────────────────────────────────────────────────
 // Client-safe (no server-only imports). The live source of truth is the
-// discovery utility in lib/getDynamicModel.ts (server-only, calls Google's
+// discovery utility in lib/ai/geminiModelDiscovery.ts (server-only, calls Google's
 // /v1beta/models with GEMINI_API_KEY) via GET /api/gemini-models. Everything
 // in this file is either (a) pure logic that has to be shared between server
 // and client code, or (b) a tiny static fallback list used only for the
 // first paint before the live list loads, or if discovery itself fails
 // (network down, key misconfigured). Never treat GEMINI_MODELS as the
-// authoritative list of what's callable — see lib/getDynamicModel.ts's
+// authoritative list of what's callable — see lib/ai/geminiModelDiscovery.ts's
 // header comment for why the discovery endpoint isn't fully authoritative
 // either.
 
@@ -60,7 +60,7 @@ export const GEMINI_MODELS: GeminiModelOption[] = [
 // Rolling aliases — Google resolves these server-side to whatever concrete
 // snapshot is currently live for that tier, so they never 404 from a
 // retirement. Used as (a) the app's zero-config default and (b) the
-// automatic retry target in lib/gemini.ts when a concrete model id 404s.
+// automatic retry target in lib/ai/gemini.ts when a concrete model id 404s.
 export const FALLBACK_MODEL_ID = "gemini-flash-lite-latest";
 
 export function rollingAliasFor(tier: ModelTier): string {

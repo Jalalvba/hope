@@ -3,14 +3,30 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { PatternAnalysis, CostInfo } from "@/types";
-import type { NewPatternFields } from "@/lib/validatePatternAnalysis";
-import { DEFAULT_MODEL_ID, nextCapableModel } from "@/lib/geminiModels";
-import { useGeminiModels } from "@/lib/useGeminiModels";
-import { CostBadge } from "@/components/CostBadge";
-import { GeminiModelSelect } from "@/components/GeminiModelSelect";
+import type { NewPatternFields } from "@/lib/utils/validatePatternAnalysis";
+import { DEFAULT_MODEL_ID, nextCapableModel } from "@/lib/ai/geminiModels";
+import { useGeminiModels } from "@/lib/hooks/useGeminiModels";
+import { CostBadge } from "@/components/ui/CostBadge";
+import { GeminiModelSelect } from "@/components/ui/GeminiModelSelect";
 
+/**
+ * Which step of the new-pattern modal is on screen.
+ *
+ * compose  — the user is typing the situation
+ * generating — waiting on Gemini
+ * review   — a draft came back and is being read; nothing is saved yet
+ * saving   — the confirmed draft is being written to MongoDB
+ * failed   — generation failed; the retry defaults to a stronger model
+ */
 type Phase = "compose" | "generating" | "review" | "saving" | "failed";
 
+/**
+ * The "new pattern" button and the modal behind it.
+ *
+ * The user describes a situation in their own words; Gemini extracts a pattern
+ * from it and analyzes it in a single call. Nothing is written to the database
+ * until the user has read the draft and confirmed it.
+ */
 export function NewPatternButton() {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState("");
@@ -52,11 +68,11 @@ export function NewPatternButton() {
       setDraftPattern(json.data.pattern);
       setDraftAnalysis(json.data.analysis);
       setPhase("review");
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Failed");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed");
       // Default the retry to the next more-capable tier — still overridable
       // via the dropdown before hitting Retry.
-      setModel((m) => nextCapableModel(m, models)?.id ?? m);
+      setModel((currentModel) => nextCapableModel(currentModel, models)?.id ?? currentModel);
       setPhase("failed");
     }
   };
@@ -74,8 +90,8 @@ export function NewPatternButton() {
       if (!res.ok) throw new Error(json.error ?? JSON.stringify(json));
       setOpen(false);
       router.push(`/patterns/${json.data.id}`);
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Failed");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed");
       setPhase("review");
     }
   };

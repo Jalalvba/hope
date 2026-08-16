@@ -9,11 +9,11 @@
 // no longer available to new users." Google's model catalog and this key's
 // per-model entitlements are two different things that can disagree. So:
 // discovery narrows the field and keeps the list fresh, but it is NOT a
-// substitute for the runtime 404 fallback in lib/gemini.ts, which is what
+// substitute for the runtime 404 fallback in lib/ai/gemini.ts, which is what
 // actually guarantees a call never hard-fails just because a snapshot was
 // retired. Treat discovery as "probably callable," not "definitely callable."
 
-import { guessTier, rollingAliasFor, type ModelTier, type GeminiModelOption } from "@/lib/geminiModels";
+import { guessTier, rollingAliasFor, type ModelTier, type GeminiModelOption } from "@/lib/ai/geminiModels";
 
 const MODELS_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models";
 
@@ -108,7 +108,7 @@ const TIER_ORDER: ModelTier[] = ["flash-lite", "flash", "pro"];
  * grouped by tier (flash-lite, then flash, then pro) and newest-first within
  * each tier. Throws on network failure or a missing/invalid API key — callers
  * decide the fallback (the API route falls back to the static list in
- * lib/geminiModels.ts; server-side callers fall back to a rolling alias).
+ * lib/ai/geminiModels.ts; server-side callers fall back to a rolling alias).
  */
 export async function fetchActiveGeminiModels(): Promise<GeminiModelOption[]> {
   const apiKey = process.env.GEMINI_API_KEY;

@@ -1,23 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
-import { assembleCreateFromDescriptionPrompt } from "@/lib/analyzePrompt";
-import { callGeminiWithTracking } from "@/lib/gemini-cost-tracker";
-import { createPatternWithAnalysisSchema } from "@/lib/patternAnalysisSchema";
-import { validateNewPatternFields, validatePatternAnalysis } from "@/lib/validatePatternAnalysis";
+import { assembleCreateFromDescriptionPrompt } from "@/lib/ai/analyzePrompt";
+import { callGeminiWithTracking } from "@/lib/ai/geminiCostTracker";
+import { createPatternWithAnalysisSchema } from "@/lib/ai/patternAnalysisSchema";
+import { validateNewPatternFields, validatePatternAnalysis } from "@/lib/utils/validatePatternAnalysis";
 
-// ─── Route handler ────────────────────────────────────────────────────────────
-// Given a narrative description, sends the extract+analyze prompt to Gemini in
-// JSON mode, validates both halves of the response, and returns them. Uses the
-// same detailed clinical architecture and RAG pipeline as
-// POST /api/patterns/analyze/generate (lib/analyzePrompt.ts) — there is only
-// one analysis depth in this app, not a separate shallow one for new patterns.
-//
-// Deliberately does NOT persist. The client renders the draft for review and
-// saves it via POST /api/patterns/create-from-paste.
+/**
+ * Turns a narrative description into a brand-new pattern AND its analysis, in
+ * a single Gemini call.
+ *
+ * Uses the same clinical architecture and RAG pipeline as
+ * POST /api/patterns/analyze/generate — there is only one analysis depth in
+ * this app, not a shallower one for new patterns.
+ *
+ * Like that route, this saves nothing: the client shows the draft for review
+ * and saves it via POST /api/patterns/create-from-paste.
+ */
 
 // Same headroom as analyze/generate: this now asks for the full 18-field
 // detailed analysis, not just a handful of summary fields.
 const MAX_OUTPUT_TOKENS = 8192;
 
+/**
+ * POST — generates one `{ pattern, analysis }` draft.
+ *
+ * @param req - Body shaped `{ description, model? }`.
+ * @returns `{ data: { pattern, analysis, costInfo } }`. Errors still carry
+ * `costInfo` when the call was billed before the failure.
+ */
 export async function POST(req: NextRequest) {
   try {
     const { description, model } = await req.json();
@@ -42,13 +51,14 @@ export async function POST(req: NextRequest) {
 
     const raw = result.result as { pattern?: unknown; analysis?: unknown } | null;
 
-    // The model routinely invents analyzedAt rather than reporting the real
-    // time, so stamp it server-side from the actual generation, matching the
-    // analyze/generate route's convention.
+    // As in analyze/generate: the timestamp is stamped server-side, because
+    // models invent them rather than reporting the real moment.
     if (raw?.analysis && typeof raw.analysis === "object") {
       (raw.analysis as Record<string, unknown>).analyzedAt = new Date().toISOString();
     }
 
+    // Both halves are validated separately so a failure says which one was
+    // malformed, rather than rejecting the whole draft anonymously.
     const patternResult = validateNewPatternFields(raw?.pattern);
     if (!patternResult.valid) {
       console.error("[create-from-description/generate] pattern mismatch:", patternResult.error);

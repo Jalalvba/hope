@@ -1,16 +1,21 @@
 import type { CostInfo } from "@/types";
 
-// ─── CostBadge ────────────────────────────────────────────────────────────────
-// Renders what one Gemini-backed action cost, from the costInfo its own response
-// carried back. Shared by every such action so the reporting looks the same
-// everywhere. Presentational only — it never fetches.
+/**
+ * Shows what one Gemini-backed action cost, using the `costInfo` that action's
+ * own response carried back. Shared by every such action so cost reporting
+ * looks the same everywhere. Presentational only — it never fetches.
+ */
 
+/** Formats a dirham amount, keeping very small costs from reading as free. */
 function formatMad(mad: number): string {
   // Sub-centime calls are common on flash-lite; "0.00 MAD" would read as free.
   if (mad > 0 && mad < 0.01) return "<0.01";
   return mad.toFixed(2);
 }
 
+/**
+ * @param costInfo - What the call cost, straight from the API response.
+ */
 export function CostBadge({ costInfo, className = "" }: { costInfo: CostInfo; className?: string }) {
   const { tier, inputTokens, outputTokens, costMad, model, remainingCreditUsd } = costInfo;
   const free = tier === "free";

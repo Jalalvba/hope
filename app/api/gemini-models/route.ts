@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { fetchActiveGeminiModels } from "@/lib/getDynamicModel";
-import { GEMINI_MODELS } from "@/lib/geminiModels";
+import { fetchActiveGeminiModels } from "@/lib/ai/geminiModelDiscovery";
+import { GEMINI_MODELS } from "@/lib/ai/geminiModels";
 
 // GET: live, tiered list of Gemini models this key can plausibly call, for
 // the model picker in AnalysisSection / NewPatternButton. Falls back to the
-// small static list in lib/geminiModels.ts if discovery fails (network, key
+// small static list in lib/ai/geminiModels.ts if discovery fails (network, key
 // missing) — the picker should never render empty.
 export async function GET() {
   try {

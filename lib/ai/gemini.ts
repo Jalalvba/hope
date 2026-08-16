@@ -7,14 +7,14 @@
 // only as a status code plus a truncated message, never echoed to the caller.
 //
 // A model id 404ing is treated as recoverable, not fatal: Google retires
-// snapshots (see lib/getDynamicModel.ts's header comment — a model can be
+// snapshots (see lib/ai/geminiModelDiscovery.ts's header comment — a model can be
 // listed as available and still 404 on generateContent). On a 404, this
 // module retries once against that model's tier rolling alias
 // (gemini-<tier>-latest), which Google always resolves to something live.
 // The caller never sees the 404; costInfo.model ends up reflecting whichever
 // concrete snapshot actually served the request, via modelVersion.
 
-import { guessTier, rollingAliasFor } from "@/lib/geminiModels";
+import { guessTier, rollingAliasFor } from "@/lib/ai/geminiModels";
 
 const ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models";
 
@@ -60,7 +60,7 @@ export interface GenerateJsonOptions {
  * JSON mode guarantees parseable output, not correct output.
  *
  * @internal Do NOT call this from a route handler or server action. Every call
- * must go through `callGeminiWithTracking` in lib/gemini-cost-tracker.ts, which
+ * must go through `callGeminiWithTracking` in lib/ai/geminiCostTracker.ts, which
  * is what measures and reports what the call cost. Calling this directly
  * silently skips cost tracking.
  */

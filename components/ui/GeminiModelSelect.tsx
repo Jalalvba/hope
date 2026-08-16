@@ -1,4 +1,4 @@
-import type { GeminiModelOption } from "@/lib/geminiModels";
+import type { GeminiModelOption } from "@/lib/ai/geminiModels";
 
 const TIER_LABELS: Record<string, string> = {
   "flash-lite": "Flash-Lite — fast & cheap",
@@ -6,9 +6,18 @@ const TIER_LABELS: Record<string, string> = {
   pro: "Pro — deep reasoning",
 };
 
-// Shared <select> for every model picker in the app, grouped by tier so the
-// cost/capability tradeoff is visible at a glance rather than just a flat
-// list. Purely presentational — pass the live list from useGeminiModels().
+/**
+ * The model picker used everywhere a Gemini call can be made.
+ *
+ * Options are grouped by tier so the cost/capability tradeoff is visible at a
+ * glance rather than as a flat list. Purely presentational — it holds no state
+ * and fetches nothing; pass it the list from `useGeminiModels()`.
+ *
+ * @param value - Id of the currently selected model.
+ * @param onChange - Called with the newly selected model's id.
+ * @param models - The models to offer.
+ * @param disabled - Locks the picker, e.g. while a request is in flight.
+ */
 export function GeminiModelSelect({
   value,
   onChange,
@@ -22,7 +31,7 @@ export function GeminiModelSelect({
   disabled?: boolean;
   className?: string;
 }) {
-  const tiers = Array.from(new Set(models.map((m) => m.tier)));
+  const tiers = Array.from(new Set(models.map((model) => model.tier)));
 
   return (
     // The trigger's own colors are Tailwind classes and theme correctly, but

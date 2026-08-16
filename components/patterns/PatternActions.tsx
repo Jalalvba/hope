@@ -4,23 +4,39 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { Pattern } from "@/types";
 
+/**
+ * Autocomplete suggestions loaded from GET /api/patterns/field-options.
+ *
+ * Declared here rather than imported from lib/db/fields.ts on purpose: this is
+ * a Client Component, and importing from a module that touches MongoDB would
+ * drag the driver into the browser bundle.
+ */
 interface FieldOptions {
   cognitiveLabels: string[];
   symptoms: string[];
   coreBeliefs: string[];
 }
 
+/**
+ * A tag-style input: pick from suggestions or type a new value, with each
+ * chosen value shown as a removable chip. Used for symptoms and cognitive
+ * labels, which are both free-form string lists.
+ *
+ * @param options - Suggestions to offer; already-selected ones are hidden.
+ * @param selected - The current values.
+ * @param onChange - Called with the full new list on every add or remove.
+ */
 function MultiSelect({ label, options, selected, onChange, placeholder }: {
   label: string; options: string[]; selected: string[];
   onChange: (v: string[]) => void; placeholder: string;
 }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const filtered = options.filter(
-    (o) => o.toLowerCase().includes(search.toLowerCase()) && !selected.includes(o)
+  const suggestions = options.filter(
+    (option) => option.toLowerCase().includes(search.toLowerCase()) && !selected.includes(option)
   );
-  const remove = (v: string) => onChange(selected.filter((s) => s !== v));
-  const add = (v: string) => { onChange([...selected, v]); setSearch(""); };
+  const remove = (value: string) => onChange(selected.filter((item) => item !== value));
+  const add = (value: string) => { onChange([...selected, value]); setSearch(""); };
 
   return (
     <div className="space-y-1">
@@ -44,12 +60,12 @@ function MultiSelect({ label, options, selected, onChange, placeholder }: {
           className="w-full text-sm text-parchment-100 placeholder-parchment-300/20 bg-transparent focus:outline-none"
         />
       </div>
-      {open && filtered.length > 0 && (
+      {open && suggestions.length > 0 && (
         <div className="glass rounded-lg border border-parchment-300/10 max-h-40 overflow-y-auto z-10 relative">
-          {filtered.map((o) => (
-            <button key={o} onMouseDown={() => add(o)}
+          {suggestions.map((option) => (
+            <button key={option} onMouseDown={() => add(option)}
               className="w-full text-left px-3 py-2 text-xs text-parchment-200/70 hover:bg-parchment-300/5 hover:text-parchment-100 transition-colors">
-              {o}
+              {option}
             </button>
           ))}
         </div>
@@ -58,13 +74,21 @@ function MultiSelect({ label, options, selected, onChange, placeholder }: {
   );
 }
 
+/**
+ * A text input with autocomplete suggestions that holds a single value. Used
+ * for the core belief, which is one sentence rather than a list.
+ *
+ * @param options - Suggestions to offer while typing.
+ * @param value - The current value.
+ * @param onChange - Called on every keystroke and on picking a suggestion.
+ */
 function SingleSelect({ label, options, value, onChange, placeholder }: {
   label: string; options: string[]; value: string;
   onChange: (v: string) => void; placeholder: string;
 }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const filtered = options.filter((o) => o.toLowerCase().includes(search.toLowerCase()));
+  const suggestions = options.filter((option) => option.toLowerCase().includes(search.toLowerCase()));
 
   return (
     <div className="space-y-1">
@@ -80,9 +104,9 @@ function SingleSelect({ label, options, value, onChange, placeholder }: {
           className="w-full text-sm text-parchment-100 placeholder-parchment-300/20 bg-transparent focus:outline-none"
         />
       </div>
-      {open && filtered.length > 0 && (
+      {open && suggestions.length > 0 && (
         <div className="glass rounded-lg border border-parchment-300/10 max-h-40 overflow-y-auto z-10 relative">
-          {filtered.map((o) => (
+          {suggestions.map((o) => (
             <button key={o} onMouseDown={() => { onChange(o); setSearch(""); setOpen(false); }}
               className="w-full text-left px-3 py-2 text-xs text-parchment-200/70 hover:bg-parchment-300/5 hover:text-parchment-100 transition-colors">
               {o}
@@ -94,6 +118,16 @@ function SingleSelect({ label, options, value, onChange, placeholder }: {
   );
 }
 
+/**
+ * Edit and delete controls shown at the top of a pattern's detail page.
+ *
+ * Rendered only for patterns created through the app (P12+) — the seeded
+ * reference patterns are read-only, which the page decides before mounting
+ * this. Moves between three modes: the plain buttons, the edit form, and a
+ * delete confirmation.
+ *
+ * @param pattern - The pattern being edited, used to seed the form.
+ */
 export function PatternActions({ pattern }: { pattern: Pattern }) {
   const router = useRouter();
   const [mode, setMode] = useState<"idle" | "edit" | "confirmDelete">("idle");
@@ -112,9 +146,11 @@ export function PatternActions({ pattern }: { pattern: Pattern }) {
 
   useEffect(() => {
     if (mode === "edit" && !options) {
+      // Autocomplete suggestions are a nicety: if the request fails the form
+      // still works, so the error is deliberately swallowed.
       fetch("/api/patterns/field-options")
-        .then((r) => r.json())
-        .then((j) => setOptions(j.data))
+        .then((response) => response.json())
+        .then((json) => setOptions(json.data))
         .catch(() => {});
     }
   }, [mode]);
@@ -132,8 +168,8 @@ export function PatternActions({ pattern }: { pattern: Pattern }) {
       if (!res.ok) throw new Error(json.error);
       setMode("idle");
       router.refresh();
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Save failed");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Save failed");
     } finally { setSaving(false); }
   };
 
@@ -143,8 +179,8 @@ export function PatternActions({ pattern }: { pattern: Pattern }) {
       const res = await fetch(`/api/patterns/${pattern.id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Delete failed");
       router.push("/");
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Delete failed");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Delete failed");
       setSaving(false);
     }
   };

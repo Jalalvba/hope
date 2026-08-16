@@ -3,8 +3,11 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 
-// Fixed corner toggle, present on every route (rendered from layout.tsx) —
-// the "global parameter" for light/dark. Cycles light -> dark -> system.
+/**
+ * The fixed corner button that switches the app between light, dark, and
+ * following the operating system. Rendered once from app/layout.tsx, so it is
+ * present on every route. Clicking cycles light -> dark -> system.
+ */
 const ORDER = ["light", "dark", "system"] as const;
 const ICON: Record<(typeof ORDER)[number], string> = { light: "☀", dark: "☾", system: "◐" };
 const LABEL: Record<(typeof ORDER)[number], string> = { light: "Light", dark: "Dark", system: "System" };

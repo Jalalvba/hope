@@ -1,17 +1,23 @@
+/**
+ * Saves a reviewed analysis onto an existing pattern.
+ *
+ * This is the second half of the two-step analysis flow: the client first
+ * calls POST /api/patterns/analyze/generate (which costs money but saves
+ * nothing), shows the result, and only calls this route once the user has
+ * looked at it and confirmed.
+ */
+
 import { NextRequest, NextResponse } from "next/server";
-import { ObjectId } from "mongodb";
-import clientPromise, { dbName } from "@/lib/mongo";
-import type { Pattern } from "@/types";
-import { validatePatternAnalysis } from "@/lib/validatePatternAnalysis";
+import { savePatternAnalysis } from "@/lib/db/patterns";
+import { validatePatternAnalysis } from "@/lib/utils/validatePatternAnalysis";
 
-const DB = dbName;
-const COL = "psy";
-
-function buildQuery(id: string) {
-  return ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { id };
-}
-
-// Saves a PatternAnalysis JSON object pasted back from Claude/Gemini's chat UI.
+/**
+ * PUT — validates and stores `body.analysis` on the pattern.
+ *
+ * @param req - Body shaped `{ analysis: PatternAnalysis }`.
+ * @returns `{ data: Pattern }` with the analysis attached; 400 if the analysis
+ * is off-contract, 404 if the pattern doesn't exist.
+ */
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -20,24 +26,17 @@ export async function PUT(
     const { id } = await params;
     const body = await req.json();
 
-    const result = validatePatternAnalysis(body.analysis);
-    if (!result.valid) {
-      return NextResponse.json({ error: result.error }, { status: 400 });
+    // Nothing reaches MongoDB unchecked: the analysis may have come from a
+    // model, so its shape is verified before it is stored.
+    const validation = validatePatternAnalysis(body.analysis);
+    if (!validation.valid) {
+      return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
-    const client = await clientPromise;
-    const db = client.db(DB);
+    const updated = await savePatternAnalysis(id, validation.data);
+    if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-    const existing = await db.collection<Pattern>(COL).findOne(buildQuery(id));
-    if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
-
-    await db.collection<Pattern>(COL).updateOne(
-      buildQuery(id),
-      { $set: { analysis: result.data, updatedAt: new Date() } }
-    );
-
-    const updated = await db.collection<Pattern>(COL).findOne(buildQuery(id));
-    return NextResponse.json({ data: { ...updated, _id: String(updated!._id) } });
+    return NextResponse.json({ data: updated });
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 });
   }
