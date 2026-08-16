@@ -32,6 +32,7 @@ export async function POST(req: NextRequest) {
 
     const result = await callGeminiWithTracking("analyze", {
       prompt: assembled.prompt,
+      systemInstruction: assembled.systemInstruction,
       responseSchema: patternAnalysisSchema,
       model: typeof model === "string" && model ? model : undefined,
       // Low temperature: this is structured clinical extraction, not creative

@@ -10,7 +10,6 @@ const STRING = { type: "STRING" } as const;
 export const patternAnalysisSchema: Record<string, unknown> = {
   type: "OBJECT",
   properties: {
-    analyzedAt: { type: "STRING", description: "ISO 8601 datetime" },
     summary: STRING,
     woundActivation: STRING,
     schemaActivated: { type: "ARRAY", items: STRING },
@@ -70,7 +69,6 @@ export const patternAnalysisSchema: Record<string, unknown> = {
     },
   },
   required: [
-    "analyzedAt",
     "summary",
     "woundActivation",
     "schemaActivated",

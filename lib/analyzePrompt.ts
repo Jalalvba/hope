@@ -119,10 +119,13 @@ function extractKeywords(pattern: Pattern): string[] {
 }
 
 
-// ─── System prompt builder ────────────────────────────────────────────────────
+// ─── System instruction ────────────────────────────────────────────────────────
+// Sent via Gemini's native `systemInstruction` field (see lib/gemini.ts), not
+// concatenated into the user prompt — keeps the persona/clinical-profile text
+// out of the conversational turn itself. Contains the user's real clinical
+// profile — do not templatize or genericize this file.
 
-function buildSystemPrompt(rylContext: string, hpContext: string): string {
-  return `You are a specialized schema therapy analyst with deep familiarity with one patient's complete psychological architecture, built over three months of intensive self-analysis sessions. Your 18-book reference library includes: Young, Klosko & Weishaar (Practitioner's Guide), Rafaeli, Bernstein & Young (Distinctive Features), Arntz & van Genderen (BPD 1st & 2nd eds), Brockman et al. (Cambridge Guide), Farrell, Reiss & Shaw (Clinician's Guide), Jacob et al. (Breaking Negative Thinking Patterns), Stevens & Roediger (Breaking Negative Relationship Patterns), Roediger, Stevens & Brockman (Contextual Schema Therapy), Leahy (Emotional Schema Therapy), van Vreeswijk et al. (Mindfulness & ST), Farrell & Shaw (Experiencing Schema Therapy), Behary & Farrell (Deliberate Practice), Young & Klosko (Reinventing Your Life), and the Wiley-Blackwell Handbook. Gilbert's three-system model (threat/drive/soothing) is used as a secondary diagnostic lens.
+export const CLINICAL_CONTEXT_DETAILED = `You are a specialized schema therapy analyst with deep familiarity with one patient's complete psychological architecture, built over three months of intensive self-analysis sessions. Your 18-book reference library includes: Young, Klosko & Weishaar (Practitioner's Guide), Rafaeli, Bernstein & Young (Distinctive Features), Arntz & van Genderen (BPD 1st & 2nd eds), Brockman et al. (Cambridge Guide), Farrell, Reiss & Shaw (Clinician's Guide), Jacob et al. (Breaking Negative Thinking Patterns), Stevens & Roediger (Breaking Negative Relationship Patterns), Roediger, Stevens & Brockman (Contextual Schema Therapy), Leahy (Emotional Schema Therapy), van Vreeswijk et al. (Mindfulness & ST), Farrell & Shaw (Experiencing Schema Therapy), Behary & Farrell (Deliberate Practice), Young & Klosko (Reinventing Your Life), and the Wiley-Blackwell Handbook. Gilbert's three-system model (threat/drive/soothing) is used as a secondary diagnostic lens.
 
 ══════════════════════════════════════════════════════
 PATIENT IDENTITY
@@ -321,13 +324,12 @@ RESPONSE RULES — NON-NEGOTIABLE
 — No citation theater. Apply actual mechanics of the theories.
 — Goal is clarity then specific practice — not comfort.
 — Every analysis ends with a concrete path from understanding to action.
-— Healing Path: when records provided, select 3-5 exercises ordered: (1) immediate in-the-moment, (2) daily practice, (3) weekly deeper work, (4) schema-level if applicable. Use exact data from records only.${rylContext}${hpContext}`;
-}
+— Healing Path: when records provided, select 3-5 exercises ordered: (1) immediate in-the-moment, (2) daily practice, (3) weekly deeper work, (4) schema-level if applicable. Use exact data from records only.`;
 
 
 // ─── User prompt builder ──────────────────────────────────────────────────────
 
-function buildUserPrompt(pattern: Pattern): string {
+function buildUserPrompt(pattern: Pattern, rylContext: string, hpContext: string): string {
   const p = pattern as Pattern & Record<string, unknown>;
   const lines = [
     `PATTERN TO ANALYZE:`,
@@ -347,8 +349,6 @@ function buildUserPrompt(pattern: Pattern): string {
 Return EXACTLY this JSON — no preamble, no code fences, start with { end with }:
 
 {
-  "analyzedAt": "<ISO 8601 datetime>",
-
   "summary": "<4-5 sentence clinical narrative. (1) Name the exact schema(s) active and which mechanism is driving. (2) Trace to classroom-to-AVIS equation OR childhood origin OR DEKRA confirmation — whichever is most precise for this specific activation. (3) Name the dominant Gilbert system and why. (4) State what this pattern functionally maintains — specifically whether it is protecting the IMAGE of competence at cost of actual effectiveness. (5) Name the mode most active and its specific behavioral expression in this activation.>",
 
   "woundActivation": "<one precise sentence — which specific formation is echoing here: the classroom scanning system, the family observation system, or the DEKRA confirmation event. Be specific to this activation.>",
@@ -410,7 +410,7 @@ Return EXACTLY this JSON — no preamble, no code fences, start with { end with 
   ]
 }
 
-HEALING PATH: Select 3-5 exercises ordered (1) immediate in-the-moment technique, (2) daily practice protocol, (3) weekly deeper work, (4) schema-level work if applicable. Use exact record data for all fields except whyThisPattern. If no records provided, return healingPath as [].`;
+HEALING PATH: Select 3-5 exercises ordered (1) immediate in-the-moment technique, (2) daily practice protocol, (3) weekly deeper work, (4) schema-level work if applicable. Use exact record data for all fields except whyThisPattern. If no records provided, return healingPath as [].${rylContext}${hpContext}`;
 }
 
 // ─── Shared assembly ──────────────────────────────────────────────────────────
@@ -418,7 +418,7 @@ HEALING PATH: Select 3-5 exercises ordered (1) immediate in-the-moment technique
 // sent to Gemini by POST /api/patterns/analyze/generate.
 
 export type AssembledPrompt =
-  | { ok: true; prompt: string; pattern: Pattern }
+  | { ok: true; systemInstruction: string; prompt: string; pattern: Pattern }
   | { ok: false; error: string; status: number };
 
 export async function assembleAnalysisPrompt(patternId: string): Promise<AssembledPrompt> {
@@ -450,8 +450,7 @@ export async function assembleAnalysisPrompt(patternId: string): Promise<Assembl
     ? `\n\n══════════════════════════════════════════════════════\nHEALING PATH — PRACTICE RECORDS (18-book library)\n══════════════════════════════════════════════════════\n${hpRecords.map(formatHPRecord).join("\n\n")}`
     : "";
 
-  const SYSTEM = buildSystemPrompt(rylContext, hpContext);
-  const userPrompt = buildUserPrompt(pattern);
+  const userPrompt = buildUserPrompt(pattern, rylContext, hpContext);
 
-  return { ok: true, prompt: `${SYSTEM}\n\n${userPrompt}`, pattern };
+  return { ok: true, systemInstruction: CLINICAL_CONTEXT_DETAILED, prompt: userPrompt, pattern };
 }
