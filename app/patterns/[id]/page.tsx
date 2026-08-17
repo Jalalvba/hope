@@ -29,7 +29,9 @@ export default async function PatternPage({
 
   return (
     <div className="min-h-screen max-w-xl mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-6">
+      {/* pr-11 clears the fixed ThemeToggle (top-4 right-4, 2rem wide), which
+          would otherwise sit on top of the Edit/Delete controls. */}
+      <div className="flex items-center justify-between mb-6 pr-11">
         <Link
           href="/"
           className="inline-flex items-center gap-1.5 text-xs text-fg-muted hover:text-fg-secondary transition-colors"
@@ -40,12 +42,14 @@ export default async function PatternPage({
       </div>
 
       <div className={`glass rounded-xl p-5 border ${colors.border} mb-6`}>
-        <div className="flex items-center justify-between mb-4">
+        {/* Stacked on narrow screens: the note is a full sentence and was
+            crowding the id chip when both shared one line. */}
+        <div className="flex flex-col items-start gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <span className={`text-xs font-mono px-2 py-0.5 rounded border ${colors.badge}`}>
             {pattern.id}
           </span>
           {pattern.note && (
-            <span className="text-[10px] text-fg-muted italic">{pattern.note}</span>
+            <span className="text-[10px] text-fg-muted italic sm:text-right">{pattern.note}</span>
           )}
         </div>
 

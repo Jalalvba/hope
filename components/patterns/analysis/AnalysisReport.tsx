@@ -206,7 +206,7 @@ export function AnalysisReport({
             {modesActive.map((m) => (
               <span
                 key={m}
-                className="text-[10px] px-2 py-0.5 rounded bg-amber-400/6 text-amber-400/50 font-mono border border-amber-400/10"
+                className="text-[10px] px-2 py-0.5 rounded bg-gold-400/6 text-gold-400 font-mono border border-gold-400/10"
               >
                 {m.replace(/_/g, " ")}
               </span>

@@ -1,14 +1,14 @@
 /**
  * Each pattern gets a colour so it stays visually recognisable between the
  * list and its detail page. The colour is derived from the pattern's number,
- * not stored — P1 is amber, P2 blue, P3 red, P4 green, P5 amber again, and so
+ * not stored — P1 is gold, P2 blue, P3 red, P4 green, P5 gold again, and so
  * on around the cycle.
  */
 
 import { patternNumber } from "@/lib/db/patterns";
 
 /** The four colours patterns cycle through, in order. */
-const COLOR_CYCLE = ["amber", "blue", "red", "green"] as const;
+const COLOR_CYCLE = ["gold", "blue", "red", "green"] as const;
 
 type PatternColor = (typeof COLOR_CYCLE)[number];
 
@@ -25,11 +25,11 @@ export interface PatternColorClasses {
 }
 
 const CLASSES: Record<PatternColor, PatternColorClasses> = {
-  amber: {
-    badge: "bg-amber-400/10 text-amber-400 border-amber-400/20",
-    border: "border-amber-400/15",
-    belief: "text-amber-400/60",
-    title: "text-amber-400",
+  gold: {
+    badge: "bg-gold-400/10 text-gold-400 border-gold-400/20",
+    border: "border-gold-400/15",
+    belief: "text-gold-400",
+    title: "text-gold-400",
   },
   blue: {
     badge: "bg-mist-400/10 text-mist-400 border-mist-400/20",
@@ -55,7 +55,7 @@ const CLASSES: Record<PatternColor, PatternColorClasses> = {
  * Picks the colour name for a pattern.
  *
  * @param id - A "P"-prefixed pattern id, e.g. "P14".
- * @returns One of "amber" | "blue" | "red" | "green".
+ * @returns One of "gold" | "blue" | "red" | "green".
  */
 function getPatternColor(id: string): PatternColor {
   const index = (patternNumber(id) - 1) % COLOR_CYCLE.length;

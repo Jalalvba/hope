@@ -9,7 +9,7 @@
 export const SCHEMA_TEXT_COLOR: Record<string, string> = {
   Failure: "text-gold-400",
   "Unrelenting Standards": "text-mist-400",
-  Subjugation: "text-amber-400",
+  Subjugation: "text-gold-400",
 };
 export const RESPONSE_MODE_TEXT_COLOR: Record<string, string> = {
   Surrender: "text-sage-400",

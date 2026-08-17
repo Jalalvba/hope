@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { HealingStep } from "@/types";
 
 const FRAMEWORK_COLORS: Record<string, string> = {
-  schema_therapy: "text-amber-400/70 bg-amber-400/8 border-amber-400/15",
+  schema_therapy: "text-gold-400 bg-gold-400/8 border-gold-400/15",
 };
 
 const FRAMEWORK_LABELS: Record<string, string> = {
