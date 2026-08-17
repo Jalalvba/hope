@@ -20,11 +20,14 @@ GEMINI_API_KEY=...   # required to generate analyses
 Then:
 
 ```bash
-npm install
-npm run dev      # http://localhost:3000
-npm run build    # production build
-npm run start    # run the production build
+pnpm install     # this repo uses pnpm — there is a pnpm-lock.yaml, no package-lock.json
+pnpm dev         # http://localhost:3000
+pnpm build       # production build
+pnpm start       # run the production build
 ```
+
+`pnpm lint` currently crashes on a dependency version mismatch — see the Known
+issues section of [CLAUDE.md](./CLAUDE.md). It is not a problem with the code.
 
 ## How it works
 
@@ -39,8 +42,8 @@ result and confirmed it, because every generation costs money.
    pattern, pulls the most relevant reference records out of MongoDB (the RAG
    step), and pairs them with a fixed clinical system instruction.
 3. Gemini answers in JSON, constrained by a response schema.
-4. The answer is checked field by field, and returned to you along with what
-   the call cost — but not saved.
+4. The answer is checked field by field by `validatePatternAnalysis()`, and
+   returned to you along with what the call cost — but not saved.
 5. If you confirm, `PUT /api/patterns/[id]/analysis` saves it.
 
 **Creating a pattern from a description** (`NewPatternButton`) is the same
