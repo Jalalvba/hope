@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { PatternAnalysis, CostInfo } from "@/types";
 import type { NewPatternFields } from "@/lib/utils/validatePatternAnalysis";
@@ -39,6 +39,23 @@ export function NewPatternButton() {
   const [draftPattern, setDraftPattern] = useState<NewPatternFields | null>(null);
   const [draftAnalysis, setDraftAnalysis] = useState<PatternAnalysis | null>(null);
   const [costInfo, setCostInfo] = useState<CostInfo | null>(null);
+
+  const titleId = useId();
+
+  /** True while a request is in flight — blocks dismissal and re-submission. */
+  const busy = phase === "generating" || phase === "saving";
+
+  // A modal must be dismissible from the keyboard, not only by clicking the
+  // scrim. Escape is ignored while a request is in flight, exactly like the
+  // scrim, so a generation can't be abandoned halfway by a stray keypress.
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !busy) setOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [open, busy]);
 
   const openModal = () => {
     setError("");
@@ -96,7 +113,6 @@ export function NewPatternButton() {
     }
   };
 
-  const busy = phase === "generating" || phase === "saving";
 
   const modelPicker = <GeminiModelSelect value={model} onChange={setModel} models={models} disabled={busy} />;
 
@@ -111,22 +127,30 @@ export function NewPatternButton() {
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
           {/* Scrim: intentionally not a themed token — a modal backdrop should
               dim the page the same way in light or dark mode. */}
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-            onClick={() => { if (!busy) setOpen(false); }} />
-          <div className="relative glass rounded-t-2xl sm:rounded-xl w-full sm:max-w-lg p-6 space-y-4 max-h-[92vh] overflow-y-auto">
+          <div
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            aria-hidden="true"
+            onClick={() => { if (!busy) setOpen(false); }}
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
+            className="relative glass rounded-t-2xl sm:rounded-xl w-full sm:max-w-lg p-6 space-y-4 max-h-[92vh] overflow-y-auto"
+          >
 
             {/* Header */}
             <div className="flex items-center justify-between">
-              <h2 className="font-display text-lg text-parchment-100">New pattern</h2>
+              <h2 id={titleId} className="font-display text-lg text-fg-primary">New pattern</h2>
               {!busy && (
                 <button onClick={() => setOpen(false)}
-                  className="text-parchment-300/30 hover:text-parchment-300/60 text-2xl leading-none">×</button>
+                  className="text-fg-muted hover:text-fg-secondary text-2xl leading-none">×</button>
               )}
             </div>
 
             {phase === "compose" && (
               <>
-                <p className="text-xs text-parchment-300/40 leading-relaxed">
+                <p className="text-xs text-fg-muted leading-relaxed">
                   Describe what happened. Gemini extracts the pattern fields and analyzes it directly —
                   review the result below before saving.
                 </p>
@@ -137,20 +161,20 @@ export function NewPatternButton() {
                     onChange={(e) => setDescription(e.target.value)}
                     onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) generate(); }}
                     autoFocus
-                    className="w-full text-sm text-parchment-100 placeholder-parchment-300/20 leading-relaxed" />
+                    className="w-full text-sm text-fg-primary placeholder-fg-muted leading-relaxed" />
                 </div>
                 <div className="flex items-center justify-between gap-3">
-                  <p className="text-[10px] text-parchment-300/40 uppercase tracking-widest">Model</p>
+                  <p className="text-[10px] text-fg-muted uppercase tracking-widest">Model</p>
                   {modelPicker}
                 </div>
-                <p className="text-[10px] text-parchment-300/20 italic">⌘ + Enter to generate</p>
+                <p className="text-[10px] text-fg-muted italic">⌘ + Enter to generate</p>
               </>
             )}
 
             {phase === "generating" && (
               <div className="flex items-center gap-3 py-4">
                 <span className="w-4 h-4 rounded-full border border-gold-400/30 border-t-gold-400 animate-spin" />
-                <span className="text-sm text-gold-400/60">Analyzing…</span>
+                <span className="text-sm text-gold-400">Analyzing…</span>
               </div>
             )}
 
@@ -158,7 +182,7 @@ export function NewPatternButton() {
               <div className="space-y-3">
                 {costInfo && <CostBadge costInfo={costInfo} />}
                 <div className="flex items-center justify-between gap-3">
-                  <p className="text-[10px] text-parchment-300/40 uppercase tracking-widest">
+                  <p className="text-[10px] text-fg-muted uppercase tracking-widest">
                     Try a different model
                   </p>
                   {modelPicker}
@@ -169,21 +193,21 @@ export function NewPatternButton() {
             {(phase === "review" || phase === "saving") && draftPattern && draftAnalysis && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="text-[10px] text-parchment-300/40 uppercase tracking-widest">
+                  <p className="text-[10px] text-fg-muted uppercase tracking-widest">
                     Review before saving
                   </p>
                   {costInfo && <CostBadge costInfo={costInfo} className="justify-end" />}
                 </div>
                 <div className="glass-subtle rounded-lg px-3 py-2.5 space-y-1.5">
-                  <p className="text-sm text-parchment-100 font-medium">{draftPattern.label}</p>
-                  <p className="text-xs text-parchment-300/50 italic">{draftPattern.coreBelief}</p>
+                  <p className="text-sm text-fg-primary font-medium">{draftPattern.label}</p>
+                  <p className="text-xs text-fg-secondary italic">{draftPattern.coreBelief}</p>
                   <div className="flex flex-wrap gap-1.5 pt-1">
                     {draftPattern.symptoms.map((s) => (
-                      <span key={s} className="text-[10px] px-2 py-0.5 rounded-full bg-gold-400/10 text-gold-400/80">{s}</span>
+                      <span key={s} className="text-[10px] px-2 py-0.5 rounded-full bg-gold-400/10 text-gold-400">{s}</span>
                     ))}
                   </div>
                 </div>
-                <p className="text-xs text-parchment-200/70 leading-relaxed">{draftAnalysis.summary}</p>
+                <p className="text-xs text-fg-secondary leading-relaxed">{draftAnalysis.summary}</p>
               </div>
             )}
 
@@ -202,7 +226,7 @@ export function NewPatternButton() {
                 <button
                   onClick={() => setPhase("compose")}
                   disabled={phase === "saving"}
-                  className="px-4 py-3 rounded-xl text-sm text-parchment-300/40 hover:text-parchment-300/70 transition-colors disabled:opacity-40">
+                  className="px-4 py-3 rounded-xl text-sm text-fg-muted hover:text-fg-secondary transition-colors disabled:opacity-40">
                   Discard
                 </button>
               </div>

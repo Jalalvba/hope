@@ -48,10 +48,10 @@ export function AnalysisSection({
   if (!analysis) {
     return (
       <div className="glass rounded-xl p-8 flex flex-col items-center gap-3">
-        <p className="text-xs text-parchment-300/40">No analysis yet.</p>
+        <p className="text-xs text-fg-muted">No analysis yet.</p>
         <button
           onClick={() => setGenerating(true)}
-          className="text-xs text-gold-400/70 hover:text-gold-400 transition-colors border border-gold-400/25 rounded-lg px-4 py-2"
+          className="text-xs text-gold-400 hover:bg-gold-400/10 transition-colors border border-gold-400/25 rounded-lg px-4 py-2"
         >
           Analyze with Gemini
         </button>

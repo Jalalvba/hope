@@ -47,12 +47,12 @@ export function GeminiModelSelect({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       disabled={disabled}
-      className={`text-[10px] bg-ink-950 text-parchment-100 border border-parchment-300/20 rounded px-1.5 py-1 disabled:opacity-50 ${className}`}
+      className={`text-[10px] bg-ink-950 text-fg-primary border border-parchment-300/20 rounded px-1.5 py-1 disabled:opacity-50 ${className}`}
     >
       {tiers.map((tier) => (
         <optgroup key={tier} label={TIER_LABELS[tier] ?? tier} className="bg-ink-950 text-parchment-300">
           {models.filter((m) => m.tier === tier).map((m) => (
-            <option key={m.id} value={m.id} title={m.description} className="bg-ink-950 text-parchment-100">
+            <option key={m.id} value={m.id} title={m.description} className="bg-ink-950 text-fg-primary">
               {m.label}
             </option>
           ))}

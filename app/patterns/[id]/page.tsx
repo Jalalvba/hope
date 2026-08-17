@@ -32,7 +32,7 @@ export default async function PatternPage({
       <div className="flex items-center justify-between mb-6">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-xs text-parchment-300/35 hover:text-parchment-300/60 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs text-fg-muted hover:text-fg-secondary transition-colors"
         >
           ← All patterns
         </Link>
@@ -45,30 +45,30 @@ export default async function PatternPage({
             {pattern.id}
           </span>
           {pattern.note && (
-            <span className="text-[10px] text-parchment-300/30 italic">{pattern.note}</span>
+            <span className="text-[10px] text-fg-muted italic">{pattern.note}</span>
           )}
         </div>
 
         <h1 className={`font-display text-2xl mb-4 ${colors.title}`}>{pattern.label}</h1>
 
         <div className="mb-5">
-          <p className="text-[10px] text-parchment-300/35 uppercase tracking-widest mb-1">
+          <p className="text-[10px] text-fg-muted uppercase tracking-widest mb-1">
             Core belief
           </p>
-          <p className="text-sm text-parchment-100 italic leading-relaxed">
+          <p className="text-sm text-fg-primary italic leading-relaxed">
             &quot;{pattern.coreBelief}&quot;
           </p>
         </div>
 
         {pattern.symptoms.length > 0 && (
           <div className="mb-5">
-            <p className="text-[10px] text-parchment-300/35 uppercase tracking-widest mb-2">
+            <p className="text-[10px] text-fg-muted uppercase tracking-widest mb-2">
               Symptoms
             </p>
             <ul className="space-y-2">
               {pattern.symptoms.map((symptom, index) => (
-                <li key={index} className="flex gap-2 text-sm text-parchment-200/65 leading-relaxed">
-                  <span className="text-parchment-300/20 shrink-0 font-mono mt-0.5">—</span>
+                <li key={index} className="flex gap-2 text-sm text-fg-secondary leading-relaxed">
+                  <span className="text-fg-faint shrink-0 font-mono mt-0.5" aria-hidden="true">—</span>
                   <span>{symptom}</span>
                 </li>
               ))}
@@ -78,14 +78,14 @@ export default async function PatternPage({
 
         {pattern.cognitiveLabels.length > 0 && (
           <div>
-            <p className="text-[10px] text-parchment-300/35 uppercase tracking-widest mb-2">
+            <p className="text-[10px] text-fg-muted uppercase tracking-widest mb-2">
               Cognitive labels
             </p>
             <div className="flex flex-wrap gap-1.5">
               {pattern.cognitiveLabels.map((label) => (
                 <span
                   key={label}
-                  className="text-[10px] px-2 py-0.5 rounded bg-parchment-300/6 text-parchment-300/45 font-mono border border-parchment-300/8"
+                  className="text-[10px] px-2 py-0.5 rounded bg-parchment-300/6 text-fg-secondary font-mono border border-parchment-300/8"
                 >
                   {label}
                 </span>

@@ -37,13 +37,13 @@ export function AnalysisReport({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-gold-400">✦</span>
-          <span className="text-[10px] text-gold-400/70 uppercase tracking-widest font-medium">
+          <span className="text-[10px] text-gold-400 uppercase tracking-widest font-medium">
             {sourceLabel(analysis.generatedBy)}
           </span>
           {analysis.generatedBy && (
             <span
               title={analysis.generatedBy}
-              className="text-[9px] font-mono text-parchment-300/25 border border-parchment-300/10 rounded px-1.5 py-0.5"
+              className="text-[9px] font-mono text-fg-muted border border-parchment-300/10 rounded px-1.5 py-0.5"
             >
               {analysis.generatedBy}
             </span>
@@ -51,13 +51,13 @@ export function AnalysisReport({
         </div>
         <div className="flex items-center gap-3">
           {analysis.analyzedAt && (
-            <span className="text-[10px] text-parchment-300/25 font-mono">
+            <span className="text-[10px] text-fg-muted font-mono">
               {formatDate(analysis.analyzedAt)}
             </span>
           )}
           <button
             onClick={onRegenerate}
-            className="text-[10px] text-parchment-300/25 hover:text-gold-400/50 transition-colors"
+            className="text-[10px] text-fg-muted hover:text-gold-400 transition-colors"
           >
             Regenerate
           </button>
@@ -66,7 +66,7 @@ export function AnalysisReport({
 
       {/* ── Summary ── */}
       {analysis.summary && (
-        <p className="text-sm text-parchment-200/85 leading-relaxed italic">
+        <p className="text-sm text-fg-primary leading-relaxed italic">
           {analysis.summary}
         </p>
       )}
@@ -74,10 +74,10 @@ export function AnalysisReport({
       {/* ── Wound activation ── */}
       {analysis.woundActivation && (
         <div className="border-l-2 border-rust-400/30 pl-3">
-          <p className="text-[10px] text-rust-400/50 uppercase tracking-widest mb-1">
+          <p className="text-[10px] text-rust-400 uppercase tracking-widest mb-1">
             Wound activation
           </p>
-          <p className="text-xs text-rust-400/80 leading-relaxed italic">
+          <p className="text-xs text-rust-400 leading-relaxed italic">
             {analysis.woundActivation}
           </p>
         </div>
@@ -92,7 +92,7 @@ export function AnalysisReport({
         ))}
         {analysis.responseMode && (
           <>
-            <span className="text-parchment-300/15">·</span>
+            <span className="text-fg-muted">·</span>
             <span className={`text-xs font-medium ${RESPONSE_MODE_TEXT_COLOR[analysis.responseMode] ?? ""}`}>
               {analysis.responseMode}
             </span>
@@ -100,11 +100,11 @@ export function AnalysisReport({
         )}
         {systemsInvolved.length > 0 && (
           <>
-            <span className="text-parchment-300/15">·</span>
+            <span className="text-fg-muted">·</span>
             {systemsInvolved.map((s) => (
               <span
                 key={s}
-                className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${SYSTEM_CHIP_COLOR[s] ?? "bg-parchment-300/5 text-parchment-300/40"}`}
+                className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${SYSTEM_CHIP_COLOR[s] ?? "bg-parchment-300/5 text-fg-muted"}`}
               >
                 {s}
               </span>
@@ -118,20 +118,20 @@ export function AnalysisReport({
         <div className="grid grid-cols-2 gap-2">
           {analysis.operationalFact && (
             <div className="bg-sage-400/5 border border-sage-400/10 rounded-lg px-3 py-2.5">
-              <p className="text-[10px] text-sage-400/55 uppercase tracking-widest mb-1">
+              <p className="text-[10px] text-sage-400 uppercase tracking-widest mb-1">
                 Situation réelle
               </p>
-              <p className="text-xs text-parchment-200/65 leading-relaxed">
+              <p className="text-xs text-fg-secondary leading-relaxed">
                 {analysis.operationalFact}
               </p>
             </div>
           )}
           {analysis.schemaNarrative && (
             <div className="bg-rust-400/5 border border-rust-400/10 rounded-lg px-3 py-2.5">
-              <p className="text-[10px] text-rust-400/55 uppercase tracking-widest mb-1">
+              <p className="text-[10px] text-rust-400 uppercase tracking-widest mb-1">
                 Narration du schéma
               </p>
-              <p className="text-xs text-parchment-200/65 leading-relaxed">
+              <p className="text-xs text-fg-secondary leading-relaxed">
                 {analysis.schemaNarrative}
               </p>
             </div>
@@ -144,12 +144,12 @@ export function AnalysisReport({
         <div className="space-y-2">
           {analysis.whatTheSchemaIsConstructing && (
             <div className="flex gap-2.5 text-xs">
-              <span className="text-rust-400/50 shrink-0 mt-0.5">⚠</span>
+              <span className="text-rust-400 shrink-0 mt-0.5">⚠</span>
               <div>
-                <p className="text-[10px] text-rust-400/45 uppercase tracking-widest mb-0.5">
+                <p className="text-[10px] text-rust-400 uppercase tracking-widest mb-0.5">
                   Schema demands
                 </p>
-                <p className="text-parchment-200/55 italic leading-relaxed">
+                <p className="text-fg-secondary italic leading-relaxed">
                   {analysis.whatTheSchemaIsConstructing}
                 </p>
               </div>
@@ -157,12 +157,12 @@ export function AnalysisReport({
           )}
           {analysis.whatTheSituationActuallyNeeds && (
             <div className="flex gap-2.5 text-xs">
-              <span className="text-sage-400/50 shrink-0 mt-0.5">→</span>
+              <span className="text-sage-400 shrink-0 mt-0.5">→</span>
               <div>
-                <p className="text-[10px] text-sage-400/45 uppercase tracking-widest mb-0.5">
+                <p className="text-[10px] text-sage-400 uppercase tracking-widest mb-0.5">
                   Situation needs
                 </p>
-                <p className="text-parchment-200/75 leading-relaxed">
+                <p className="text-fg-primary leading-relaxed">
                   {analysis.whatTheSituationActuallyNeeds}
                 </p>
               </div>
@@ -174,10 +174,10 @@ export function AnalysisReport({
       {/* ── Schema maintenance belief ── */}
       {analysis.schemaMaintenanceBelief && (
         <div className="bg-gold-400/5 border border-gold-400/10 rounded-lg px-3 py-2.5">
-          <p className="text-[10px] text-gold-400/50 uppercase tracking-widest mb-1">
+          <p className="text-[10px] text-gold-400 uppercase tracking-widest mb-1">
             Demanding Parent voice
           </p>
-          <p className="text-xs text-parchment-200/70 leading-relaxed italic">
+          <p className="text-xs text-fg-secondary leading-relaxed italic">
             &quot;{analysis.schemaMaintenanceBelief}&quot;
           </p>
         </div>
@@ -186,12 +186,12 @@ export function AnalysisReport({
       {/* ── Emotional schema running ── */}
       {(analysis as PatternAnalysis & { emotionalSchemaRunning?: string }).emotionalSchemaRunning && (
         <div className="flex gap-2.5 text-xs">
-          <span className="text-mist-400/50 shrink-0 mt-0.5">◈</span>
+          <span className="text-mist-400 shrink-0 mt-0.5">◈</span>
           <div>
-            <p className="text-[10px] text-mist-400/45 uppercase tracking-widest mb-0.5">
+            <p className="text-[10px] text-mist-400 uppercase tracking-widest mb-0.5">
               Emotional schema active
             </p>
-            <p className="text-parchment-200/55 leading-relaxed italic">
+            <p className="text-fg-secondary leading-relaxed italic">
               {(analysis as PatternAnalysis & { emotionalSchemaRunning?: string }).emotionalSchemaRunning}
             </p>
           </div>
@@ -223,7 +223,7 @@ export function AnalysisReport({
             {relatedPatterns.map((p) => (
               <span
                 key={p}
-                className="text-[10px] px-1.5 py-0.5 rounded border border-parchment-300/10 text-parchment-300/40 font-mono"
+                className="text-[10px] px-1.5 py-0.5 rounded border border-parchment-300/10 text-fg-muted font-mono"
               >
                 {p}
               </span>
@@ -238,11 +238,11 @@ export function AnalysisReport({
           <Label>Book frameworks</Label>
           {bookMappings.map((m, i) => (
             <div key={i} className="flex gap-2 text-xs">
-              <span className="text-parchment-300/20 font-mono shrink-0">—</span>
+              <span className="text-fg-faint font-mono shrink-0" aria-hidden="true">—</span>
               <div>
-                <span className="text-gold-400/70 font-medium">{m.concept}</span>
-                <span className="text-parchment-300/25 mx-1">·</span>
-                <span className="text-parchment-300/45 italic">{m.relevance}</span>
+                <span className="text-gold-400 font-medium">{m.concept}</span>
+                <span className="text-fg-muted mx-1">·</span>
+                <span className="text-fg-secondary italic">{m.relevance}</span>
               </div>
             </div>
           ))}
@@ -252,12 +252,12 @@ export function AnalysisReport({
       {/* ── Regulation evidence ── */}
       {analysis.regulationEvidence && (
         <div className="flex gap-2.5 text-xs">
-          <span className="text-sage-400/60 shrink-0 mt-0.5">✓</span>
+          <span className="text-sage-400 shrink-0 mt-0.5">✓</span>
           <div>
-            <p className="text-[10px] text-sage-400/45 uppercase tracking-widest mb-0.5">
+            <p className="text-[10px] text-sage-400 uppercase tracking-widest mb-0.5">
               Regulation evidence
             </p>
-            <p className="text-parchment-200/55 leading-relaxed">
+            <p className="text-fg-secondary leading-relaxed">
               {analysis.regulationEvidence}
             </p>
           </div>
@@ -271,10 +271,10 @@ export function AnalysisReport({
           {(["behavioral", "cognitive", "schema"] as const).map((layer) =>
             analysis.layerStatus![layer] ? (
               <div key={layer} className="flex gap-3 text-xs">
-                <span className="text-parchment-300/25 font-mono w-16 shrink-0 capitalize">
+                <span className="text-fg-muted font-mono w-16 shrink-0 capitalize">
                   {layer}
                 </span>
-                <span className="text-parchment-200/50 leading-relaxed">
+                <span className="text-fg-secondary leading-relaxed">
                   {analysis.layerStatus![layer]}
                 </span>
               </div>
@@ -286,8 +286,8 @@ export function AnalysisReport({
       {/* ── Practice ── */}
       {analysis.practiceRecommendation && (
         <div className="bg-sage-400/5 border border-sage-400/10 rounded-lg px-3 py-3">
-          <p className="text-[10px] text-sage-400/55 uppercase tracking-widest mb-1.5">Practice</p>
-          <p className="text-xs text-parchment-200/70 leading-relaxed">
+          <p className="text-[10px] text-sage-400 uppercase tracking-widest mb-1.5">Practice</p>
+          <p className="text-xs text-fg-secondary leading-relaxed">
             {analysis.practiceRecommendation}
           </p>
         </div>
@@ -298,10 +298,10 @@ export function AnalysisReport({
         <div className="space-y-3 pt-2">
           <div className="flex items-center gap-2">
             <span className="text-sage-400">⟡</span>
-            <span className="text-[10px] text-sage-400/70 uppercase tracking-widest font-medium">
+            <span className="text-[10px] text-sage-400 uppercase tracking-widest font-medium">
               Healing Path — Action Plan
             </span>
-            <span className="text-[9px] text-parchment-300/25 font-mono ml-auto">
+            <span className="text-[9px] text-fg-muted font-mono ml-auto">
               {healingPath.length} exercises
             </span>
           </div>

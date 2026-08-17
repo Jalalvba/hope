@@ -25,8 +25,8 @@ export function CostBadge({ costInfo, className = "" }: { costInfo: CostInfo; cl
       <span
         className={
           free
-            ? "px-2 py-0.5 rounded-full bg-gold-400/10 text-gold-400/80"
-            : "px-2 py-0.5 rounded-full bg-rust-400/10 text-rust-400/90"
+            ? "px-2 py-0.5 rounded-full bg-gold-400/10 text-gold-400"
+            : "px-2 py-0.5 rounded-full bg-rust-400/10 text-rust-400"
         }
         // The free/paid call is inferred locally, not reported by Google.
         title={
@@ -38,11 +38,11 @@ export function CostBadge({ costInfo, className = "" }: { costInfo: CostInfo; cl
         {free ? "free tier" : `${formatMad(costMad)} MAD · paid`}
       </span>
 
-      <span className="text-parchment-300/35">
+      <span className="text-fg-muted">
         {inputTokens.toLocaleString()} in / {outputTokens.toLocaleString()} out
       </span>
 
-      <span className="text-parchment-300/25">{model}</span>
+      <span className="text-fg-muted">{model}</span>
     </div>
   );
 }

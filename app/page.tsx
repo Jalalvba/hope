@@ -24,10 +24,10 @@ export default async function Home() {
   return (
     <div className="min-h-screen max-w-xl mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="font-display text-3xl text-parchment-100 leading-tight">
+        <h1 className="font-display text-3xl text-fg-primary leading-tight">
           Psyche <span className="text-gold-400">Log</span>
         </h1>
-        <p className="text-xs text-parchment-300/35 mt-1 font-mono">
+        <p className="text-xs text-fg-muted mt-1 font-mono">
           {patterns.length} patterns · personal clinical journal
         </p>
       </div>
@@ -38,7 +38,7 @@ export default async function Home() {
 
       {recentEntries.length > 0 && (
         <div className="mb-8">
-          <p className="text-[10px] text-parchment-300/30 uppercase tracking-widest mb-3">
+          <p className="text-[10px] text-fg-muted uppercase tracking-widest mb-3">
             Recent entries
           </p>
           <div className="space-y-3">
@@ -49,16 +49,29 @@ export default async function Home() {
         </div>
       )}
 
-      <div>
-        <p className="text-[10px] text-parchment-300/30 uppercase tracking-widest mb-3">
-          Reference patterns
-        </p>
-        <div className="space-y-3">
-          {referencePatterns.map((pattern) => (
-            <PatternCard key={pattern.id} pattern={pattern} />
-          ))}
+      {referencePatterns.length > 0 && (
+        <div>
+          <p className="text-[10px] text-fg-muted uppercase tracking-widest mb-3">
+            Reference patterns
+          </p>
+          <div className="space-y-3">
+            {referencePatterns.map((pattern) => (
+              <PatternCard key={pattern.id} pattern={pattern} />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Empty state: a brand-new database renders no cards at all, so say what
+          this page is for rather than showing two bare headings. */}
+      {patterns.length === 0 && (
+        <div className="glass rounded-xl p-8 text-center">
+          <p className="text-sm text-fg-secondary">No patterns yet.</p>
+          <p className="text-xs text-fg-muted mt-1">
+            Describe a situation above and Gemini will draft the first one.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

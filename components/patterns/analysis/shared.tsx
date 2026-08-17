@@ -49,7 +49,7 @@ export function sourceLabel(generatedBy?: string): string {
 /** A small uppercase caption above a block of analysis text. */
 export function Label({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[10px] text-parchment-300/30 uppercase tracking-widest mb-1.5">
+    <p className="text-[10px] text-fg-muted uppercase tracking-widest mb-1.5">
       {children}
     </p>
   );

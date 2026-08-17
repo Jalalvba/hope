@@ -46,6 +46,21 @@
   --color-mist-400: #8b9cb0;
   --color-mist-500: #6b7e94;
 
+  /* Foreground (text) tiers — full opacity, AA-verified in BOTH themes.
+     De-emphasis MUST come from these tokens, not from an opacity modifier on
+     a text colour: on the light page background even pure black at 40% alpha
+     only reaches 2.83:1, below AA-large, so an opacity ladder cannot be made
+     accessible at any hue. Measured ratios against the page background:
+       fg-primary   17.4 dark / 15.3 light
+       fg-secondary  8.0 dark /  7.1 light
+       fg-muted      5.1 dark /  5.2 light   (AA for normal text)
+       fg-faint      3.4 dark /  3.8 light   (AA-large ONLY — decoration,
+                                              never text carrying meaning) */
+  --color-fg-primary: #f4efe6;
+  --color-fg-secondary: #b1a28f;
+  --color-fg-muted: #8d7f6c;
+  --color-fg-faint: #6f6455;
+
   /* Glass panel surfaces — decoupled from the ink-* scale (rather than
      literal rgba() built from ink-800's hex, as before) so they can be
      retuned per theme without fighting the "ink" name meaning something
@@ -58,9 +73,9 @@
 
 /* Light theme — accent hues are deepened (not just inverted) versus their
    dark-mode values, since the same hex at the same alpha reads fine on
-   near-black but fails text contrast on a light page. Checked against
-   WCAG AA (4.5:1) for the body/label tones at full opacity; many usages
-   apply further opacity on top for de-emphasis, same as in dark mode. */
+   near-black but fails text contrast on a light page. All accent tones meet
+   WCAG AA (4.5:1) on the page background AT FULL OPACITY, which is why text
+   never applies an opacity modifier to them — see the fg-* note above. */
 :root[data-theme="light"] {
   --color-ink-950: #faf7f2;
   --color-ink-900: #f0e9de;
@@ -80,6 +95,11 @@
   --color-sage-500: #2f5236;
   --color-mist-400: #45566b;
   --color-mist-500: #34445a;
+
+  --color-fg-primary: #241f1a;
+  --color-fg-secondary: #5e5248;
+  --color-fg-muted: #736658;
+  --color-fg-faint: #8a7d6e;
 
   --glass-bg: rgba(255, 255, 255, 0.55);
   --glass-border: rgba(36, 31, 26, 0.08);

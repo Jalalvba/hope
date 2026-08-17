@@ -98,10 +98,10 @@ export function GenerateAnalysisFlow({
   return (
     <div className="glass rounded-xl p-5 space-y-4 border-l-2 border-gold-400/25">
       <div className="flex items-center justify-between">
-        <span className="text-[10px] text-gold-400/70 uppercase tracking-widest font-medium">
+        <span className="text-[10px] text-gold-400 uppercase tracking-widest font-medium">
           Gemini analysis
         </span>
-        <button onClick={onCancel} className="text-parchment-300/30 hover:text-parchment-300/60 text-sm leading-none">
+        <button onClick={onCancel} className="text-fg-muted hover:text-fg-secondary text-sm leading-none">
           Cancel
         </button>
       </div>
@@ -109,7 +109,7 @@ export function GenerateAnalysisFlow({
       {stage === "select" && (
         <div className="space-y-3">
           <div className="flex items-center justify-between gap-3">
-            <p className="text-[10px] text-parchment-300/40 uppercase tracking-widest">Model</p>
+            <p className="text-[10px] text-fg-muted uppercase tracking-widest">Model</p>
             {modelPicker}
           </div>
           <button
@@ -124,7 +124,7 @@ export function GenerateAnalysisFlow({
       {stage === "generating" && (
         <div className="flex items-center gap-3 py-4">
           <div className="w-4 h-4 rounded-full border border-gold-400/30 border-t-gold-400 animate-spin" />
-          <p className="text-xs text-parchment-300/40">Analyzing…</p>
+          <p className="text-xs text-fg-muted">Analyzing…</p>
         </div>
       )}
 
@@ -133,7 +133,7 @@ export function GenerateAnalysisFlow({
           <p className="text-xs text-rust-400 bg-rust-400/8 px-3 py-2 rounded-lg">{error}</p>
           {costInfo && <CostBadge costInfo={costInfo} />}
           <div className="flex items-center justify-between gap-3">
-            <p className="text-[10px] text-parchment-300/40 uppercase tracking-widest">
+            <p className="text-[10px] text-fg-muted uppercase tracking-widest">
               Try a different model
             </p>
             {modelPicker}
@@ -150,22 +150,22 @@ export function GenerateAnalysisFlow({
       {(stage === "review" || stage === "saving") && draft && (
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-3">
-            <p className="text-[10px] text-parchment-300/40 uppercase tracking-widest">
+            <p className="text-[10px] text-fg-muted uppercase tracking-widest">
               Review before saving
             </p>
             {costInfo && <CostBadge costInfo={costInfo} className="justify-end" />}
           </div>
-          <p className="text-sm text-parchment-100/80 leading-relaxed">{draft.summary}</p>
+          <p className="text-sm text-fg-primary leading-relaxed">{draft.summary}</p>
           <div className="flex flex-wrap gap-1.5">
             {(Array.isArray(draft.schemaActivated) ? draft.schemaActivated : []).map((s) => (
-              <span key={s} className="text-[10px] px-2 py-0.5 rounded-full bg-gold-400/10 text-gold-400/80">
+              <span key={s} className="text-[10px] px-2 py-0.5 rounded-full bg-gold-400/10 text-gold-400">
                 {s}
               </span>
             ))}
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-gold-400/10 text-gold-400/80">
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-gold-400/10 text-gold-400">
               {draft.responseMode}
             </span>
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-gold-400/10 text-gold-400/80">
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-gold-400/10 text-gold-400">
               {(Array.isArray(draft.healingPath) ? draft.healingPath : []).length} healing steps
             </span>
           </div>
@@ -185,14 +185,14 @@ export function GenerateAnalysisFlow({
             <button
               onClick={() => setStage("select")}
               disabled={stage === "saving"}
-              className="px-4 py-2.5 rounded-lg text-sm text-parchment-300/40 hover:text-parchment-300/70 transition-colors disabled:opacity-40"
+              className="px-4 py-2.5 rounded-lg text-sm text-fg-muted hover:text-fg-secondary transition-colors disabled:opacity-40"
             >
               Different model
             </button>
             <button
               onClick={onCancel}
               disabled={stage === "saving"}
-              className="px-4 py-2.5 rounded-lg text-sm text-parchment-300/40 hover:text-parchment-300/70 transition-colors disabled:opacity-40"
+              className="px-4 py-2.5 rounded-lg text-sm text-fg-muted hover:text-fg-secondary transition-colors disabled:opacity-40"
             >
               Discard
             </button>

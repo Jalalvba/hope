@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useId, useState } from "react";
 import { TagInput } from "@/components/ui/TagInput";
 import { SuggestInput } from "@/components/ui/SuggestInput";
 import { useRouter } from "next/navigation";
@@ -31,6 +31,8 @@ interface FieldOptions {
  */
 export function PatternActions({ pattern }: { pattern: Pattern }) {
   const router = useRouter();
+  // One id prefix per mounted form, so labels can point at their own inputs.
+  const fieldId = useId();
   const [mode, setMode] = useState<"idle" | "edit" | "confirmDelete">("idle");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -88,7 +90,7 @@ export function PatternActions({ pattern }: { pattern: Pattern }) {
 
   if (mode === "confirmDelete") return (
     <div className="glass rounded-xl p-4 border border-rust-400/20 space-y-3 mb-4">
-      <p className="text-sm text-parchment-200/70">
+      <p className="text-sm text-fg-secondary">
         Delete <span className="text-rust-400 font-mono">{pattern.id}</span>? This cannot be undone.
       </p>
       {error && <p className="text-xs text-rust-400">{error}</p>}
@@ -98,7 +100,7 @@ export function PatternActions({ pattern }: { pattern: Pattern }) {
           {saving ? "Deleting…" : "Yes, delete"}
         </button>
         <button onClick={() => setMode("idle")}
-          className="text-xs text-parchment-300/40 hover:text-parchment-300/70 transition-colors">
+          className="text-xs text-fg-muted hover:text-fg-secondary transition-colors">
           Cancel
         </button>
       </div>
@@ -108,28 +110,28 @@ export function PatternActions({ pattern }: { pattern: Pattern }) {
   if (mode === "edit") return (
     <div className="glass rounded-xl p-5 space-y-4 border border-parchment-300/8 mb-4">
       <div className="flex items-center justify-between">
-        <span className="text-[10px] text-parchment-300/35 uppercase tracking-widest">Edit pattern</span>
+        <span className="text-[10px] text-fg-muted uppercase tracking-widest">Edit pattern</span>
         <button onClick={() => setMode("idle")}
-          className="text-parchment-300/25 hover:text-parchment-300/60 transition-colors text-xl leading-none">✕</button>
+          className="text-fg-muted hover:text-fg-secondary transition-colors text-xl leading-none">✕</button>
       </div>
 
       {/* Label */}
       <div className="space-y-1">
-        <label className="text-[10px] text-parchment-300/40 uppercase tracking-widest">Label</label>
+        <label htmlFor={`${fieldId}-label`} className="text-[10px] text-fg-muted uppercase tracking-widest">Label</label>
         <div className="glass-subtle rounded-lg px-3 py-2.5 field-ring">
-          <input value={form.label}
+          <input id={`${fieldId}-label`} value={form.label}
             onChange={(e) => setForm((f) => ({ ...f, label: e.target.value }))}
-            className="w-full text-sm text-parchment-100 bg-transparent focus:outline-none" />
+            className="w-full text-sm text-fg-primary bg-transparent focus:outline-none" />
         </div>
       </div>
 
       {/* Short */}
       <div className="space-y-1">
-        <label className="text-[10px] text-parchment-300/40 uppercase tracking-widest">Short name</label>
+        <label htmlFor={`${fieldId}-short`} className="text-[10px] text-fg-muted uppercase tracking-widest">Short name</label>
         <div className="glass-subtle rounded-lg px-3 py-2.5 field-ring">
-          <input value={form.short}
+          <input id={`${fieldId}-short`} value={form.short}
             onChange={(e) => setForm((f) => ({ ...f, short: e.target.value }))}
-            className="w-full text-sm text-parchment-100 bg-transparent focus:outline-none" />
+            className="w-full text-sm text-fg-primary bg-transparent focus:outline-none" />
         </div>
       </div>
 
@@ -162,11 +164,11 @@ export function PatternActions({ pattern }: { pattern: Pattern }) {
 
       {/* Note */}
       <div className="space-y-1">
-        <label className="text-[10px] text-parchment-300/40 uppercase tracking-widest">Note (optional)</label>
+        <label htmlFor={`${fieldId}-note`} className="text-[10px] text-fg-muted uppercase tracking-widest">Note (optional)</label>
         <div className="glass-subtle rounded-lg px-3 py-2.5 field-ring">
-          <input value={form.note}
+          <input id={`${fieldId}-note`} value={form.note}
             onChange={(e) => setForm((f) => ({ ...f, note: e.target.value }))}
-            className="w-full text-sm text-parchment-100 bg-transparent focus:outline-none"
+            className="w-full text-sm text-fg-primary bg-transparent focus:outline-none"
             placeholder="e.g. Variant of P3..." />
         </div>
       </div>
@@ -179,7 +181,7 @@ export function PatternActions({ pattern }: { pattern: Pattern }) {
           {saving ? "Saving…" : "Save changes"}
         </button>
         <button onClick={() => setMode("idle")}
-          className="text-xs text-parchment-300/40 hover:text-parchment-300/70 transition-colors">
+          className="text-xs text-fg-muted hover:text-fg-secondary transition-colors">
           Cancel
         </button>
       </div>
@@ -189,11 +191,11 @@ export function PatternActions({ pattern }: { pattern: Pattern }) {
   return (
     <div className="flex gap-3">
       <button onClick={() => setMode("edit")}
-        className="text-[10px] text-parchment-300/30 hover:text-gold-400/60 transition-colors uppercase tracking-widest">
+        className="text-[10px] text-fg-muted hover:text-gold-400 transition-colors uppercase tracking-widest">
         Edit
       </button>
       <button onClick={() => setMode("confirmDelete")}
-        className="text-[10px] text-parchment-300/30 hover:text-rust-400/60 transition-colors uppercase tracking-widest">
+        className="text-[10px] text-fg-muted hover:text-rust-400 transition-colors uppercase tracking-widest">
         Delete
       </button>
     </div>

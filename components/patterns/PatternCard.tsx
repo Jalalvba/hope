@@ -36,16 +36,16 @@ export function PatternCard({ pattern }: { pattern: Pattern }) {
         </span>
         <div className="flex items-center gap-2">
           {showsAnalysisStatus && pattern.analysis && (
-            <span className="text-[10px] font-mono text-sage-400/60">✦ analyzed</span>
+            <span className="text-[10px] font-mono text-sage-400">✦ analyzed</span>
           )}
           {showsAnalysisStatus && !pattern.analysis && (
-            <span className="text-[10px] font-mono text-gold-400/40">pending</span>
+            <span className="text-[10px] font-mono text-gold-400">pending</span>
           )}
-          <span className="text-parchment-300/20 text-xs">→</span>
+          <span className="text-fg-faint text-xs" aria-hidden="true">→</span>
         </div>
       </div>
 
-      <h2 className="font-display text-base text-parchment-100 leading-snug">{pattern.label}</h2>
+      <h2 className="font-display text-base text-fg-primary leading-snug">{pattern.label}</h2>
 
       <p className={`text-xs italic leading-relaxed line-clamp-1 ${colors.belief}`}>
         &quot;{pattern.coreBelief}&quot;
@@ -56,13 +56,13 @@ export function PatternCard({ pattern }: { pattern: Pattern }) {
           {pattern.cognitiveLabels.slice(0, MAX_VISIBLE_LABELS).map((label) => (
             <span
               key={label}
-              className="text-[10px] px-1.5 py-0.5 rounded bg-parchment-300/5 text-parchment-300/30 font-mono"
+              className="text-[10px] px-1.5 py-0.5 rounded bg-parchment-300/5 text-fg-muted font-mono"
             >
               {label}
             </span>
           ))}
           {hiddenLabelCount > 0 && (
-            <span className="text-[10px] text-parchment-300/20">+{hiddenLabelCount}</span>
+            <span className="text-[10px] text-fg-muted">+{hiddenLabelCount}</span>
           )}
         </div>
       )}
