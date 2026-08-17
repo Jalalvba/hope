@@ -5,4 +5,4 @@
  */
 
 export type { Pattern, HealingStep, PatternAnalysis } from "./pattern";
-export type { CostInfo, ApiSuccess, ApiError } from "./api";
+export type { CostInfo } from "./api";

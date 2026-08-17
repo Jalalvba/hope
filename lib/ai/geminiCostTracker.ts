@@ -22,7 +22,7 @@ import type { CostInfo } from "@/types";
 // Note the model IDs use DOTS (gemini-3.5-flash-lite), not dashes.
 // To add a model: add a row. Nothing else needs to change.
 
-export interface ModelPricing {
+interface ModelPricing {
   /** USD per 1M input tokens. */
   input: number;
   /** USD per 1M output tokens. */
@@ -53,7 +53,7 @@ export interface ModelPricing {
 // check time) — treat as approximate and re-verify before relying on it for
 // real budgeting. freeRequestsPerDay set to 0: preview/pro tiers are unlikely
 // to carry a free allowance, and 0 is the safe (over-report) direction.
-export const PRICING: Record<string, ModelPricing> = {
+const PRICING: Record<string, ModelPricing> = {
   "gemini-3.5-flash-lite": { input: 0.3, output: 2.5, freeRequestsPerDay: 1000 },
   "gemini-3.1-flash-lite": { input: 0.25, output: 1.5, freeRequestsPerDay: 1000 },
   "gemini-3.5-flash": { input: 1.5, output: 9.0, freeRequestsPerDay: 250 },
@@ -77,7 +77,7 @@ const ALIAS_FALLBACK: Record<string, string> = {
   "gemini-flash-latest": "gemini-3.5-flash",
 };
 
-export function resolvePricing(model: string): { key: string; pricing: ModelPricing } {
+function resolvePricing(model: string): { key: string; pricing: ModelPricing } {
   if (PRICING[model]) return { key: model, pricing: PRICING[model] };
 
   const aliased = ALIAS_FALLBACK[model];
@@ -97,12 +97,12 @@ export function resolvePricing(model: string): { key: string; pricing: ModelPric
 
 /** MAD per USD. Override with USD_TO_MAD_RATE; a static rate is fine here since
  *  these figures are indicative, not accounting. */
-export const USD_TO_MAD = Number(process.env.USD_TO_MAD_RATE) || 9.4;
+const USD_TO_MAD = Number(process.env.USD_TO_MAD_RATE) || 9.4;
 
 const round = (n: number, dp: number) => Math.round(n * 10 ** dp) / 10 ** dp;
 
 /** Cost of one call at paid-tier rates, regardless of which tier it was served on. */
-export function computeCallCost(
+function computeCallCost(
   model: string,
   inputTokens: number,
   outputTokens: number
@@ -135,7 +135,7 @@ async function db() {
  * Pacific also observes DST, so this must go through the IANA zone rather than
  * a fixed offset.
  */
-export function quotaDayKey(now = new Date()): string {
+function quotaDayKey(now = new Date()): string {
   return new Intl.DateTimeFormat("en-CA", {
     timeZone: "America/Los_Angeles",
     year: "numeric",
@@ -192,7 +192,7 @@ interface TotalsDoc {
  * collection is the single source of truth for spend; this function and
  * `costInfo.remainingCreditUsd` both read it, so they cannot disagree.
  */
-export async function getRemainingCredit(): Promise<number> {
+async function getRemainingCredit(): Promise<number> {
   const rows = await (await db()).collection<TotalsDoc>(TOTALS_COLLECTION).find({}).toArray();
   const spent = rows.reduce((sum, r) => sum + (r.total_cost_usd ?? 0), 0);
   return round(STARTING_CREDIT_USD - spent, 6);

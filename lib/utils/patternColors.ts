@@ -10,7 +10,7 @@ import { patternNumber } from "@/lib/db/patterns";
 /** The four colours patterns cycle through, in order. */
 const COLOR_CYCLE = ["amber", "blue", "red", "green"] as const;
 
-export type PatternColor = (typeof COLOR_CYCLE)[number];
+type PatternColor = (typeof COLOR_CYCLE)[number];
 
 /** Tailwind classes for one colour, in each place a pattern is rendered. */
 export interface PatternColorClasses {
@@ -57,7 +57,7 @@ const CLASSES: Record<PatternColor, PatternColorClasses> = {
  * @param id - A "P"-prefixed pattern id, e.g. "P14".
  * @returns One of "amber" | "blue" | "red" | "green".
  */
-export function getPatternColor(id: string): PatternColor {
+function getPatternColor(id: string): PatternColor {
   const index = (patternNumber(id) - 1) % COLOR_CYCLE.length;
   return COLOR_CYCLE[index < 0 ? 0 : index];
 }

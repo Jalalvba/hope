@@ -9,7 +9,7 @@
 import { patternNumber } from "@/lib/db/patterns";
 
 /** The highest pattern number that is seeded, read-only reference material. */
-export const LAST_REFERENCE_PATTERN_NUMBER = 11;
+const LAST_REFERENCE_PATTERN_NUMBER = 11;
 
 /**
  * Whether a pattern was created through the app (and is therefore editable).

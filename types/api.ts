@@ -22,15 +22,3 @@ export interface CostInfo {
   /** Prepaid balance remaining after this call. */
   remainingCreditUsd: number;
 }
-
-/** A successful JSON response from any route in `app/api/`. */
-export interface ApiSuccess<T> {
-  data: T;
-}
-
-/** A failed JSON response. `costInfo` is present when a Gemini call was billed
- *  before the failure (e.g. the model answered, but off-contract). */
-export interface ApiError {
-  error: string;
-  costInfo?: CostInfo;
-}
