@@ -31,7 +31,7 @@ export default async function PatternPage({
     <div className="min-h-screen max-w-xl mx-auto px-4 py-8">
       {/* pr-11 clears the fixed ThemeToggle (top-4 right-4, 2rem wide), which
           would otherwise sit on top of the Edit/Delete controls. */}
-      <div className="flex items-center justify-between mb-6 pr-11">
+      <div className="flex flex-wrap items-center justify-between gap-y-4 mb-6 pr-11">
         <Link
           href="/"
           className="inline-flex items-center gap-1.5 text-xs text-fg-muted hover:text-fg-secondary transition-colors"

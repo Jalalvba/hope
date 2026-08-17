@@ -89,7 +89,7 @@ export function PatternActions({ pattern }: { pattern: Pattern }) {
   };
 
   if (mode === "confirmDelete") return (
-    <div className="glass rounded-xl p-4 border border-rust-400/20 space-y-3 mb-4">
+    <div className="glass rounded-xl p-4 border border-rust-400/20 space-y-3 mb-4 w-full">
       <p className="text-sm text-fg-secondary">
         Delete <span className="text-rust-400 font-mono">{pattern.id}</span>? This cannot be undone.
       </p>
@@ -108,7 +108,7 @@ export function PatternActions({ pattern }: { pattern: Pattern }) {
   );
 
   if (mode === "edit") return (
-    <div className="glass rounded-xl p-5 space-y-4 border border-parchment-300/8 mb-4">
+    <div className="glass rounded-xl p-5 space-y-4 border border-parchment-300/8 mb-4 w-full">
       <div className="flex items-center justify-between">
         <span className="text-[10px] text-fg-muted uppercase tracking-widest">Edit pattern</span>
         <button onClick={() => setMode("idle")}
