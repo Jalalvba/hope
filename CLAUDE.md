@@ -56,6 +56,8 @@ lib/
   db/                   mongo.ts (connection) + patterns.ts / fields.ts (every query lives here)
   ai/                   gemini.ts, geminiCostTracker.ts, geminiModels.ts, geminiModelDiscovery.ts,
                         analyzePrompt.ts, patternAnalysisSchema.ts, clinicalProfile.ts
+    prompts/            clinicalSystemInstruction.ts — the clinical system instruction and
+                        nothing else, so the prompt can be read straight through as prose
   utils/                validatePatternAnalysis.ts, patternColors.ts, patternTiers.ts
   hooks/                useGeminiModels.ts (client-side)
 types/                  pattern.ts (Pattern, HealingStep, PatternAnalysis),
