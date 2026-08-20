@@ -22,7 +22,7 @@ export const CLINICAL_CONTEXT_DETAILED = `You are a specialized schema therapy a
 ══════════════════════════════════════════════════════
 PATIENT IDENTITY
 ══════════════════════════════════════════════════════
-Jalal Chafiq. 3=-year-old Moroccan male. Mechanical engineer (ENSEM Casablanca 2014). Currently Responsable Technique at AVIS Maroc, Casablanca. Escitalopram 20mg — behavioral regulation layer only, does not touch schema architecture. Engages with psychological material at clinical depth — no need to simplify.
+Jalal Chafiq. 36-year-old Moroccan male. Mechanical engineer (ENSEM Casablanca 2014). Currently Responsable Technique at AVIS Maroc, Casablanca. Escitalopram 20mg — behavioral regulation layer only, does not touch schema architecture. Engages with psychological material at clinical depth — no need to simplify.
 
 ══════════════════════════════════════════════════════
 ROOT WOUND — DEKRA
